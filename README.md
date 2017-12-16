@@ -152,5 +152,3 @@ recordView.setCancelBounds(130);
 - [NetoDevel](https://github.com/NetoDevel) for some inspiration and some code in his lib [audio-recorder-button](https://github.com/safetysystemtechnology/audio-recorder-button) 
 - [alexjlockwood](https://github.com/alexjlockwood) for making this Awesome tool  [ShapeShifter](https://shapeshifter.design/) which helped me to animate vectors easily
 
-- ~~[wnafee](https://github.com/wnafee) for his lib [vector-compat](https://github.com/wnafee/vector-compat) which helped me to make AnimatedVectorDrawable Compaitable in older APIs ~~ removed in latest version because the support library fixed the issue.
-
