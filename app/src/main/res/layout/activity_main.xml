@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/parent_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.devlomi.recordview.MainActivity">
@@ -11,6 +12,21 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="#e4e4e4" />
+        android:layout_toLeftOf="@id/record_button"
+        app:slide_to_cancel_arrow="@drawable/ic_keyboard_arrow_left"
+        app:slide_to_cancel_text="Slide To Cancel"
+        app:slide_to_cancel_margin_right="10dp"/>
+
+    <com.devlomi.record_view.RecordButton
+        android:id="@+id/record_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:background="@drawable/bg_mic"
+        android:scaleType="centerInside"
+        app:src="@drawable/ic_mic_white"
+        />
+
 
 </RelativeLayout>
