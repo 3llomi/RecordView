@@ -45,7 +45,7 @@ public class RecordButton extends android.support.v7.widget.AppCompatImageView i
         if (attrs != null) {
             TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.RecordButton);
 
-            int imageResource = typedArray.getResourceId(R.styleable.RecordView_slide_to_cancel_arrow, -1);
+            int imageResource = typedArray.getResourceId(R.styleable.RecordButton_src, -1);
 
 
             if (imageResource != -1) {
