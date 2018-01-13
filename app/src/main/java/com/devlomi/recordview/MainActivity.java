@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.devlomi.record_view.OnBasketAnimationEnd;
 import com.devlomi.record_view.OnRecordClickListener;
 import com.devlomi.record_view.OnRecordListener;
 import com.devlomi.record_view.RecordButton;
@@ -36,10 +37,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Toast.makeText(MainActivity.this, "RECORD BUTTON CLICKED", Toast.LENGTH_SHORT).show();
-                Log.d("RecordButton","RECORD BUTTON CLICKED");
+                Log.d("RecordButton", "RECORD BUTTON CLICKED");
             }
         });
-
 
 
         //Cancel Bounds is when the Slide To Cancel text gets before the timer . default is 130
@@ -47,7 +47,6 @@ public class MainActivity extends AppCompatActivity {
 
 
         recordView.setSmallMicColor(Color.parseColor("#c2185b"));
-
 
         //prevent recording under one Second
         recordView.setLessThanSecondAllowed(false);
@@ -92,6 +91,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
+        recordView.setOnBasketAnimationEndListener(new OnBasketAnimationEnd() {
+            @Override
+            public void onAnimationEnd() {
+                Log.d("RecordView", "Basket Animation Finished");
+            }
+        });
 
     }
 

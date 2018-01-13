@@ -46,7 +46,8 @@ public class RecordView extends RelativeLayout {
     private Context context;
     private AlphaAnimation alphaAnimation1, alphaAnimation2;
     private OnRecordListener recordListener;
-    AnimatedVectorDrawableCompat animatedVectorDrawable;
+    private OnBasketAnimationEnd onBasketAnimationEndListener;
+    private AnimatedVectorDrawableCompat animatedVectorDrawable;
     private boolean isSwiped, isLessThanSecondAllowed = false;
     private boolean isSoundEnabled = true;
     private int RECORD_START = R.raw.record_start;
@@ -170,6 +171,9 @@ public class RecordView extends RelativeLayout {
             @Override
             public void onAnimationEnd(Animation animation) {
                 basketImg.setVisibility(INVISIBLE);
+
+                if (onBasketAnimationEndListener != null)
+                    onBasketAnimationEndListener.onAnimationEnd();
             }
 
             @Override
@@ -453,6 +457,10 @@ public class RecordView extends RelativeLayout {
 
     public void setOnRecordListener(OnRecordListener recrodListener) {
         this.recordListener = recrodListener;
+    }
+
+    public void setOnBasketAnimationEndListener(OnBasketAnimationEnd onBasketAnimationEndListener) {
+        this.onBasketAnimationEndListener = onBasketAnimationEndListener;
     }
 
     public void setSoundEnabled(boolean isEnabled) {
