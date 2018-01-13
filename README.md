@@ -13,7 +13,7 @@ a Simple Audio Recorder View with hold to Record Button and Swipe to Cancel
 ## Install
 ```gradle
 dependencies {
-  compile 'com.devlomi.record-view:record-view:1.2beta'
+  compile 'com.devlomi.record-view:record-view:1.2.1beta'
 }
 ```
 
@@ -120,6 +120,19 @@ recordView.setOnRecordListener(new OnRecordListener() {
                 Log.d("RecordButton","RECORD BUTTON CLICKED");
             }
         });
+```
+
+### Listen for Basket Animation End
+
+```java
+
+   recordView.setOnBasketAnimationEndListener(new OnBasketAnimationEnd() {
+            @Override
+            public void onAnimationEnd() {
+                Log.d("RecordView", "Basket Animation Finished");
+            }
+        });
+
 ```
 
 
