@@ -13,7 +13,7 @@ a Simple Audio Recorder View with hold to Record Button and Swipe to Cancel
 ## Install
 ```gradle
 dependencies {
-  compile 'com.devlomi.record-view:record-view:1.2.1beta'
+  compile 'com.devlomi.record-view:record-view:1.2.2beta'
 }
 ```
 
