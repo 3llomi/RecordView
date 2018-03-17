@@ -7,7 +7,7 @@ publish {
     groupId = 'com.devlomi.record-view'
     artifactId = 'record-view'
     uploadName = 'RecordView'
-    publishVersion = '1.2beta'
+    publishVersion = '1.2.2beta'
     desc = 'a Simple Audio Recorder View with hold to Record Button and Swipe to Cancel'
     dryRun = false
     website = 'https://github.com/3llomi/RecordView'

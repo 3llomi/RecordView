@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.devlomi.record_view.OnBasketAnimationEnd;
@@ -24,13 +25,28 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         RecordView recordView = (RecordView) findViewById(R.id.record_view);
-        RecordButton recordButton = (RecordButton) findViewById(R.id.record_button);
+        final RecordButton recordButton = (RecordButton) findViewById(R.id.record_button);
+        Button btnChangeOnclick = (Button) findViewById(R.id.btn_change_onclick);
 
         //IMPORTANT
         recordButton.setRecordView(recordView);
 
         // if you want to click the button (in case if you want to make the record button a Send Button for example..)
 //        recordButton.setListenForRecord(false);
+
+        btnChangeOnclick.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (recordButton.isListenForRecord()) {
+                    recordButton.setListenForRecord(false);
+                    Toast.makeText(MainActivity.this, "onClickEnabled", Toast.LENGTH_SHORT).show();
+                } else {
+                    recordButton.setListenForRecord(true);
+                    Toast.makeText(MainActivity.this, "onClickDisabled", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
 
         //ListenForRecord must be false ,otherwise onClick will not be called
         recordButton.setOnRecordClickListener(new OnRecordClickListener() {

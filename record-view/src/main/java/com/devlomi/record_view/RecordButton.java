@@ -12,13 +12,13 @@ import android.view.View;
  * Created by Devlomi on 13/12/2017.
  */
 
-public class RecordButton extends android.support.v7.widget.AppCompatImageView implements View.OnTouchListener {
+public class RecordButton extends android.support.v7.widget.AppCompatImageView implements View.OnTouchListener, View.OnClickListener {
 
     private ScaleAnim scaleAnim;
     private RecordView recordView;
     private boolean listenForRecord = true;
     private OnRecordClickListener onRecordClickListener;
-    private float onClickX = 0;
+
 
 
     public void setRecordView(RecordView recordView) {
@@ -39,6 +39,7 @@ public class RecordButton extends android.support.v7.widget.AppCompatImageView i
         super(context, attrs, defStyleAttr);
         init(context, attrs);
 
+
     }
 
     private void init(Context context, AttributeSet attrs) {
@@ -58,8 +59,11 @@ public class RecordButton extends android.support.v7.widget.AppCompatImageView i
 
         scaleAnim = new ScaleAnim(this);
         this.setOnTouchListener(this);
+        this.setOnClickListener(this);
+
 
     }
+
 
     private void setTheImageResource(int imageResource) {
         Drawable image = AppCompatResources.getDrawable(getContext(), imageResource);
@@ -68,32 +72,29 @@ public class RecordButton extends android.support.v7.widget.AppCompatImageView i
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                if (listenForRecord)
+        if (isListenForRecord()) {
+            switch (event.getAction()) {
+
+                case MotionEvent.ACTION_DOWN:
                     recordView.onActionDown((RecordButton) v, event);
+                    break;
 
-                else {
-                    onClickX = event.getX();
-                }
 
-                break;
-            case MotionEvent.ACTION_MOVE:
-                if (listenForRecord)
+                case MotionEvent.ACTION_MOVE:
                     recordView.onActionMove((RecordButton) v, event);
-                break;
-            case MotionEvent.ACTION_UP:
-                if (listenForRecord)
-                    recordView.onActionUp((RecordButton) v);
+                    break;
 
-                else {
-                    if (onClickX == event.getX() && onRecordClickListener != null) {
-                        onRecordClickListener.onClick(v);
-                    }
-                }
-                break;
+                case MotionEvent.ACTION_UP:
+                    recordView.onActionUp((RecordButton) v);
+                    break;
+
+            }
+
         }
-        return true;
+        return isListenForRecord();
+
+
+
     }
 
 
@@ -116,4 +117,12 @@ public class RecordButton extends android.support.v7.widget.AppCompatImageView i
     public void setOnRecordClickListener(OnRecordClickListener onRecordClickListener) {
         this.onRecordClickListener = onRecordClickListener;
     }
+
+
+    @Override
+    public void onClick(View v) {
+        if (onRecordClickListener != null)
+            onRecordClickListener.onClick(v);
+    }
 }
+
