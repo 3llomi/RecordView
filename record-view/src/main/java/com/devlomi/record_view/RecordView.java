@@ -1,5 +1,9 @@
 package com.devlomi.record_view;
 
+import android.animation.Animator;
+import android.animation.AnimatorInflater;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
@@ -16,6 +20,7 @@ import android.support.v7.content.res.AppCompatResources;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -85,6 +90,9 @@ public class RecordView extends RelativeLayout {
     private void init(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         View view = View.inflate(context, R.layout.record_view, null);
         addView(view);
+        ViewGroup viewGroup = (ViewGroup) view.getParent();
+        viewGroup.setClipChildren(false);
+
         slideToCancelLayout = view.findViewById(R.id.slide_to_cancel_layout);
         arrow = view.findViewById(R.id.arrow);
         slideToCancel = view.findViewById(R.id.slide_to_cancel);
@@ -119,21 +127,43 @@ public class RecordView extends RelativeLayout {
         }
 
         animatedVectorDrawable = AnimatedVectorDrawableCompat.create(context, R.drawable.basket_animated);
+
+        setAllParentsClip(smallBlinkingMic, false);
+    }
+
+
+
+    public static void setAllParentsClip(View v, boolean enabled) {
+        while (v.getParent() != null && v.getParent() instanceof ViewGroup) {
+            ViewGroup viewGroup = (ViewGroup) v.getParent();
+            viewGroup.setClipChildren(enabled);
+            viewGroup.setClipToPadding(enabled);
+            v = viewGroup;
+        }
     }
 
 
     private void animateBasket() {
-        basketImg.setVisibility(VISIBLE);
+
+        AnimatorSet micAnimation = (AnimatorSet) AnimatorInflater.loadAnimator(context, R.animator.delete_mic_animation);
+        micAnimation.setTarget(smallBlinkingMic); // set the view you want to animate
+        micAnimation.start();
+
         final TranslateAnimation translateAnimation1 = new TranslateAnimation(0, 0, basketInitialY, basketInitialY - 90);
         translateAnimation1.setDuration(250);
-        basketImg.startAnimation(translateAnimation1);
-
 
         final TranslateAnimation translateAnimation2 = new TranslateAnimation(0, 0, basketInitialY - 130, basketInitialY);
-        translateAnimation2.setDuration(350);
+        translateAnimation2.setDuration(750);
 
         basketImg.setImageDrawable(animatedVectorDrawable);
 
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                basketImg.setVisibility(VISIBLE);
+                basketImg.startAnimation(translateAnimation1);
+            }
+        },350);
 
         translateAnimation1.setAnimationListener(new Animation.AnimationListener() {
             @Override
@@ -142,8 +172,9 @@ public class RecordView extends RelativeLayout {
 
             @Override
             public void onAnimationEnd(Animation animation) {
-                animatedVectorDrawable.start();
+                smallBlinkingMic.setVisibility(INVISIBLE);
 
+                animatedVectorDrawable.start();
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
@@ -151,7 +182,7 @@ public class RecordView extends RelativeLayout {
                         clearAlphaAnimation();
                         basketImg.setVisibility(INVISIBLE);
                     }
-                }, 350);
+                }, 450);
 
 
             }
@@ -161,6 +192,7 @@ public class RecordView extends RelativeLayout {
 
             }
         });
+
 
         translateAnimation2.setAnimationListener(new Animation.AnimationListener() {
             @Override
@@ -183,6 +215,15 @@ public class RecordView extends RelativeLayout {
         });
 
 
+    }
+
+    void reset(View view) {
+        AnimatorSet set = new AnimatorSet();
+        ObjectAnimator scaleY = ObjectAnimator.ofFloat(view, "scaleY", 1.0f);
+        ObjectAnimator scaleX = ObjectAnimator.ofFloat(view, "scaleX", 1.0f);
+        set.setDuration(100);
+        set.playTogether(scaleY, scaleX);
+        set.start();
     }
 
     private void hideViews() {
@@ -334,7 +375,7 @@ public class RecordView extends RelativeLayout {
         if (recordListener != null)
             recordListener.onStart();
 
-
+        reset(smallBlinkingMic);
         recordBtn.startScale();
         initialX = recordBtn.getX();
 
