@@ -133,7 +133,7 @@ public class RecordView extends RelativeLayout {
 
 
 
-    public static void setAllParentsClip(View v, boolean enabled) {
+    public static void  setAllParentsClip(View v, boolean enabled) {
         while (v.getParent() != null && v.getParent() instanceof ViewGroup) {
             ViewGroup viewGroup = (ViewGroup) v.getParent();
             viewGroup.setClipChildren(enabled);
@@ -147,13 +147,14 @@ public class RecordView extends RelativeLayout {
 
         AnimatorSet micAnimation = (AnimatorSet) AnimatorInflater.loadAnimator(context, R.animator.delete_mic_animation);
         micAnimation.setTarget(smallBlinkingMic); // set the view you want to animate
+        micAnimation.setDuration(600);
         micAnimation.start();
 
         final TranslateAnimation translateAnimation1 = new TranslateAnimation(0, 0, basketInitialY, basketInitialY - 90);
         translateAnimation1.setDuration(250);
 
         final TranslateAnimation translateAnimation2 = new TranslateAnimation(0, 0, basketInitialY - 130, basketInitialY);
-        translateAnimation2.setDuration(750);
+        translateAnimation2.setDuration(250);
 
         basketImg.setImageDrawable(animatedVectorDrawable);
 
@@ -163,7 +164,7 @@ public class RecordView extends RelativeLayout {
                 basketImg.setVisibility(VISIBLE);
                 basketImg.startAnimation(translateAnimation1);
             }
-        },350);
+        },700);
 
         translateAnimation1.setAnimationListener(new Animation.AnimationListener() {
             @Override
@@ -182,7 +183,7 @@ public class RecordView extends RelativeLayout {
                         clearAlphaAnimation();
                         basketImg.setVisibility(INVISIBLE);
                     }
-                }, 450);
+                }, 250);
 
 
             }
