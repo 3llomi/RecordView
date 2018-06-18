@@ -171,7 +171,8 @@ recordView.setCancelBounds(30);//dp
 - [alexjlockwood](https://github.com/alexjlockwood) for making this Awesome tool  [ShapeShifter](https://shapeshifter.design/) which helped me to animate vectors easily
 - team-supercharge for making [ShimmerLayout](https://github.com/team-supercharge/ShimmerLayout)
 
- Copyright [2018] [AbdulAlim Rajjoub]
+```
+   Copyright 2018 AbdulAlim Rajjoub
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -184,3 +185,4 @@ recordView.setCancelBounds(30);//dp
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
+```
