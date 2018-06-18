@@ -4,21 +4,22 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.support.v7.content.res.AppCompatResources;
+import android.support.v7.widget.AppCompatImageView;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 
 /**
  * Created by Devlomi on 13/12/2017.
  */
 
-public class RecordButton extends android.support.v7.widget.AppCompatImageView implements View.OnTouchListener, View.OnClickListener {
+public class RecordButton extends AppCompatImageView implements View.OnTouchListener, View.OnClickListener {
 
     private ScaleAnim scaleAnim;
     private RecordView recordView;
     private boolean listenForRecord = true;
     private OnRecordClickListener onRecordClickListener;
-
 
 
     public void setRecordView(RecordView recordView) {
@@ -46,7 +47,7 @@ public class RecordButton extends android.support.v7.widget.AppCompatImageView i
         if (attrs != null) {
             TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.RecordButton);
 
-            int imageResource = typedArray.getResourceId(R.styleable.RecordButton_src, -1);
+            int imageResource = typedArray.getResourceId(R.styleable.RecordButton_mic_icon, -1);
 
 
             if (imageResource != -1) {
@@ -58,10 +59,33 @@ public class RecordButton extends android.support.v7.widget.AppCompatImageView i
 
 
         scaleAnim = new ScaleAnim(this);
+
+
         this.setOnTouchListener(this);
         this.setOnClickListener(this);
 
 
+    }
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        setClip(this);
+    }
+
+    public void setClip(View v) {
+        if (v.getParent() == null) {
+            return;
+        }
+
+        if (v instanceof ViewGroup) {
+            ((ViewGroup) v).setClipChildren(false);
+            ((ViewGroup) v).setClipToPadding(false);
+        }
+
+        if (v.getParent() instanceof View) {
+            setClip((View) v.getParent());
+        }
     }
 
 
@@ -69,6 +93,7 @@ public class RecordButton extends android.support.v7.widget.AppCompatImageView i
         Drawable image = AppCompatResources.getDrawable(getContext(), imageResource);
         setImageDrawable(image);
     }
+
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
@@ -92,7 +117,6 @@ public class RecordButton extends android.support.v7.widget.AppCompatImageView i
 
         }
         return isListenForRecord();
-
 
 
     }
@@ -125,4 +149,3 @@ public class RecordButton extends android.support.v7.widget.AppCompatImageView i
             onRecordClickListener.onClick(v);
     }
 }
-

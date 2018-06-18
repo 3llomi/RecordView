@@ -1,5 +1,10 @@
+[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-RecordView-orange.svg?style=flat)](https://android-arsenal.com/details/1/6259)
+
+ [ ![Download](https://api.bintray.com/packages/devlomi/maven/RecordView/images/download.svg) ](https://bintray.com/devlomi/maven/RecordView/_latestVersion)
+
+
 # RecordView
-a Simple Audio Recorder View with hold to Record Button and Swipe to Cancel
+A Simple Audio Recorder View with hold to Record Button and Swipe to Cancel
 
 
 ## Demo
@@ -14,6 +19,7 @@ a Simple Audio Recorder View with hold to Record Button and Swipe to Cancel
 ```gradle
 dependencies {
   compile 'com.devlomi.record-view:record-view:1.2.2beta'
+  //appcompat v26+ is higly recommended to support older APIs
 }
 ```
 
@@ -24,14 +30,13 @@ dependencies {
 
 ```xml
 
- <?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/parent_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.devlomi.recordview.MainActivity">
+    android:layout_height="match_parent">
 
     <com.devlomi.record_view.RecordView
         android:id="@+id/record_view"
@@ -39,9 +44,10 @@ dependencies {
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_toLeftOf="@id/record_button"
-        app:slide_to_cancel_arrow="@drawable/ic_keyboard_arrow_left"
-        app:slide_to_cancel_text="Slide To Cancel"
-        app:slide_to_cancel_margin_right="10dp"/>
+        app:slide_to_cancel_arrow="@drawable/recv_ic_arrow"
+        app:slide_to_cancel_bounds="10dp"
+        app:slide_to_cancel_margin_right="10dp"
+        app:slide_to_cancel_text="Slide To Cancel" />
 
     <com.devlomi.record_view.RecordButton
         android:id="@+id/record_button"
@@ -49,13 +55,13 @@ dependencies {
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        android:background="@drawable/bg_mic"
+        android:background="@drawable/recv_bg_mic"
         android:scaleType="centerInside"
-        app:src="@drawable/ic_mic_white"
-        />
+        app:mic_icon="@drawable/recv_ic_mic_white" />
 
 
 </RelativeLayout>
+
 
 ```
 
@@ -136,10 +142,11 @@ recordView.setOnRecordListener(new OnRecordListener() {
 ```
 
 
-Change Swipe To Cancel Bounds (when the 'Slide To Cancel' Text View get before Counter)
+Change Swipe To Cancel Bounds (when the 'Slide To Cancel' Text View get before Counter).
+default is 25dp
 
 ```java
-recordView.setCancelBounds(130);
+recordView.setCancelBounds(30);//dp
 ```
 
 ### Some Customization
@@ -164,4 +171,4 @@ recordView.setCancelBounds(130);
 ### Thanks/Credits
 - [NetoDevel](https://github.com/NetoDevel) for some inspiration and some code in his lib [audio-recorder-button](https://github.com/safetysystemtechnology/audio-recorder-button) 
 - [alexjlockwood](https://github.com/alexjlockwood) for making this Awesome tool  [ShapeShifter](https://shapeshifter.design/) which helped me to animate vectors easily
-
+- team-supercharge for making [ShimmerLayout](https://github.com/team-supercharge/ShimmerLayout)

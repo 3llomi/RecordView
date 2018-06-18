@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/parent_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clipChildren="false"
+    android:clipToPadding="false"
+    android:paddingBottom="15dp"
+    android:paddingTop="15dp"
+    android:visibility="visible">
+
+
+    <io.supercharge.shimmerlayout.ShimmerLayout
+        android:id="@+id/shimmer_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        app:shimmer_animation_duration="1500"
+        app:shimmer_color="#ffffff"
+        app:shimmer_reverse_animation="true">
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/arrow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/slide_to_cancel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#444" />
+
+
+        </LinearLayout>
+    </io.supercharge.shimmerlayout.ShimmerLayout>
+
+    <ImageView
+        android:id="@+id/glowing_mic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_centerInParent="true"
+        android:layout_marginLeft="8dp"
+        app:srcCompat="@drawable/recv_ic_mic" />
+
+    <ImageView
+        android:id="@+id/basket_img"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_centerInParent="true"
+        android:layout_marginLeft="8dp"
+
+        android:visibility="invisible" />
+
+    <Chronometer
+        android:id="@+id/counter_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_marginLeft="8dp"
+        android:layout_toRightOf="@id/glowing_mic"
+        android:gravity="center"
+        android:text="00:00"
+        android:textStyle="bold" />
+
+
+</RelativeLayout>
+
+
+
