@@ -1,7 +1,5 @@
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-RecordView-orange.svg?style=flat)](https://android-arsenal.com/details/1/6259)
-
  [ ![Download](https://api.bintray.com/packages/devlomi/maven/RecordView/images/download.svg) ](https://bintray.com/devlomi/maven/RecordView/_latestVersion)
-
 
 # RecordView
 A Simple Audio Recorder View with hold to Record Button and Swipe to Cancel
@@ -18,7 +16,7 @@ A Simple Audio Recorder View with hold to Record Button and Swipe to Cancel
 ## Install
 ```gradle
 dependencies {
-  compile 'com.devlomi.record-view:record-view:1.2.2beta'
+  compile 'com.devlomi.record-view:record-view:2.0.0'
   //appcompat v26+ is higly recommended to support older APIs
 }
 ```
@@ -172,3 +170,17 @@ recordView.setCancelBounds(30);//dp
 - [NetoDevel](https://github.com/NetoDevel) for some inspiration and some code in his lib [audio-recorder-button](https://github.com/safetysystemtechnology/audio-recorder-button) 
 - [alexjlockwood](https://github.com/alexjlockwood) for making this Awesome tool  [ShapeShifter](https://shapeshifter.design/) which helped me to animate vectors easily
 - team-supercharge for making [ShimmerLayout](https://github.com/team-supercharge/ShimmerLayout)
+
+ Copyright [2018] [AbdulAlim Rajjoub]
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
