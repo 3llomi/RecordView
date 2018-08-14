@@ -16,7 +16,7 @@ A Simple Audio Recorder View with hold to Record Button and Swipe to Cancel
 ## Install
 ```gradle
 dependencies {
-  compile 'com.devlomi.record-view:record-view:2.0.0'
+  implementation 'com.devlomi.record-view:record-view:2.0.1'
   //appcompat v26+ is higly recommended to support older APIs
 }
 ```
@@ -43,9 +43,12 @@ dependencies {
         android:layout_alignParentBottom="true"
         android:layout_toLeftOf="@id/record_button"
         app:slide_to_cancel_arrow="@drawable/recv_ic_arrow"
-        app:slide_to_cancel_bounds="10dp"
+        app:slide_to_cancel_arrow_color="#000000"
+        app:slide_to_cancel_bounds="8dp"
         app:slide_to_cancel_margin_right="10dp"
-        app:slide_to_cancel_text="Slide To Cancel" />
+        app:slide_to_cancel_text="Slide To Cancel"
+        app:counter_time_color="#ff0000"
+        />
 
     <com.devlomi.record_view.RecordButton
         android:id="@+id/record_button"
@@ -141,10 +144,10 @@ recordView.setOnRecordListener(new OnRecordListener() {
 
 
 Change Swipe To Cancel Bounds (when the 'Slide To Cancel' Text View get before Counter).
-default is 25dp
+default is 8dp
 
 ```java
-recordView.setCancelBounds(30);//dp
+recordView.setCancelBounds(8);//dp
 ```
 
 ### Some Customization
@@ -163,6 +166,13 @@ recordView.setCancelBounds(30);//dp
         //set Custom sounds onRecord 
         //you can pass 0 if you don't want to play sound in certain state
         recordView.setCustomSounds(R.raw.record_start,R.raw.record_finished,0);
+        
+        //change slide To Cancel Text Color
+        recordView.setSlideToCancelTextColor(Color.parseColor("#ff0000"));
+        //change slide To Cancel Arrow Color
+        recordView.setSlideToCancelArrowColor(Color.parseColor("#ff0000"));
+        //change Counter Time (Chronometer) color
+        recordView.setCounterTimeColor(Color.parseColor("#ff0000"));
 
 ```
 

@@ -58,8 +58,8 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        //Cancel Bounds is when the Slide To Cancel text gets before the timer . default is 25
-        recordView.setCancelBounds(30);
+        //Cancel Bounds is when the Slide To Cancel text gets before the timer . default is 8
+        recordView.setCancelBounds(8);
 
 
         recordView.setSmallMicColor(Color.parseColor("#c2185b"));
@@ -114,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("RecordView", "Basket Animation Finished");
             }
         });
+
 
     }
 

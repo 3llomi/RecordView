@@ -22,9 +22,12 @@
         android:layout_alignParentBottom="true"
         android:layout_toLeftOf="@id/record_button"
         app:slide_to_cancel_arrow="@drawable/recv_ic_arrow"
+        app:slide_to_cancel_arrow_color="#000000"
         app:slide_to_cancel_bounds="10dp"
         app:slide_to_cancel_margin_right="10dp"
-        app:slide_to_cancel_text="Slide To Cancel" />
+        app:slide_to_cancel_text="Slide To Cancel"
+        app:counter_time_color="#ff0000"
+        />
 
     <com.devlomi.record_view.RecordButton
         android:id="@+id/record_button"

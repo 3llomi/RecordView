@@ -27,7 +27,7 @@ import io.supercharge.shimmerlayout.ShimmerLayout;
 
 public class RecordView extends RelativeLayout {
 
-    public static final int DEFAULT_CANCEL_BOUNDS = 25; //25dp
+    public static final int DEFAULT_CANCEL_BOUNDS = 8; //8dp
     private ImageView smallBlinkingMic, basketImg;
     private Chronometer counterTime;
     private TextView slideToCancel;
@@ -93,6 +93,8 @@ public class RecordView extends RelativeLayout {
             int slideArrowResource = typedArray.getResourceId(R.styleable.RecordView_slide_to_cancel_arrow, -1);
             String slideToCancelText = typedArray.getString(R.styleable.RecordView_slide_to_cancel_text);
             int slideMarginRight = (int) typedArray.getDimension(R.styleable.RecordView_slide_to_cancel_margin_right, 30);
+            int counterTimeColor = typedArray.getColor(R.styleable.RecordView_counter_time_color, -1);
+            int arrowColor = typedArray.getColor(R.styleable.RecordView_slide_to_cancel_arrow_color, -1);
 
 
             int cancelBounds = typedArray.getDimensionPixelSize(R.styleable.RecordView_slide_to_cancel_bounds, -1);
@@ -103,11 +105,20 @@ public class RecordView extends RelativeLayout {
 
             if (slideArrowResource != -1) {
                 Drawable slideArrow = AppCompatResources.getDrawable(getContext(), slideArrowResource);
-                arrow.setBackground(slideArrow);
+                arrow.setImageDrawable(slideArrow);
             }
 
             if (slideToCancelText != null)
                 slideToCancel.setText(slideToCancelText);
+
+            if (counterTimeColor != -1)
+                setCounterTimeColor(counterTimeColor);
+
+
+            if (arrowColor != -1)
+                setSlideToCancelArrowColor(arrowColor);
+
+
 
             setMarginRight(slideMarginRight, true);
 
@@ -210,7 +221,7 @@ public class RecordView extends RelativeLayout {
         if (!isSwiped) {
 
             //Swipe To Cancel
-            if (slideToCancelLayout.getX() != 0 && slideToCancelLayout.getX() <= counterTime.getX() + cancelBounds) {
+            if (slideToCancelLayout.getX() != 0 && slideToCancelLayout.getX() <= counterTime.getRight() + cancelBounds) {
 
                 //if the time was less than one second then do not start basket animation
                 if (isLessThanOneSecond(time)) {
@@ -370,6 +381,16 @@ public class RecordView extends RelativeLayout {
     public void setCancelBounds(float cancelBounds) {
         setCancelBounds(cancelBounds, true);
     }
+
+    //set Chronometer color
+    public void setCounterTimeColor(int color) {
+        counterTime.setTextColor(color);
+    }
+    
+    public void setSlideToCancelArrowColor(int color){
+        arrow.setColorFilter(color);
+    }
+
 
     private void setCancelBounds(float cancelBounds, boolean convertDpToPixel) {
         float bounds = convertDpToPixel ? DpUtil.toPixel(cancelBounds, context) : cancelBounds;
