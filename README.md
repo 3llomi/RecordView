@@ -2,6 +2,9 @@
  [ ![Download](https://api.bintray.com/packages/devlomi/maven/RecordView/images/download.svg) ](https://bintray.com/devlomi/maven/RecordView/_latestVersion)
 
 # RecordView
+
+<img src="Logotype primary.png" width="70%" height="70%" />
+
 A Simple Audio Recorder View with hold to Record Button and Swipe to Cancel
 
 
