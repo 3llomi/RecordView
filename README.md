@@ -184,6 +184,9 @@ recordView.setCancelBounds(8);//dp
 - [alexjlockwood](https://github.com/alexjlockwood) for making this Awesome tool  [ShapeShifter](https://shapeshifter.design/) which helped me to animate vectors easily
 - team-supercharge for making [ShimmerLayout](https://github.com/team-supercharge/ShimmerLayout)
 
+## Looking for IOS Version?
+try out [iRecordView](https://github.com/3llomi/iRecordView)
+
 ```
    Copyright 2018 AbdulAlim Rajjoub
 
