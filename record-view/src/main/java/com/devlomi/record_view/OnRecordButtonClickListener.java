@@ -6,6 +6,6 @@ import android.view.View;
  * Created by Devlomi on 16/12/2017.
  */
 
-public interface OnRecordClickListener {
+public interface OnRecordButtonClickListener {
     void onClick(View v);
 }

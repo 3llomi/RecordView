@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/parent_layout"
@@ -20,11 +21,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_toLeftOf="@id/record_button"
+        android:layout_toStartOf="@id/record_button"
         app:slide_to_cancel_arrow="@drawable/recv_ic_arrow"
         app:slide_to_cancel_arrow_color="#000000"
         app:slide_to_cancel_bounds="10dp"
-        app:slide_to_cancel_margin_right="10dp"
+        app:slide_to_cancel_margin_end="10dp"
         app:slide_to_cancel_text="Slide To Cancel"
         app:counter_time_color="#ff0000"
         />
@@ -34,7 +35,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
         android:background="@drawable/recv_bg_mic"
         android:scaleType="centerInside"
         app:mic_icon="@drawable/recv_ic_mic_white" />

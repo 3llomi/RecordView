@@ -3,8 +3,8 @@ package com.devlomi.record_view;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
-import android.support.v7.content.res.AppCompatResources;
-import android.support.v7.widget.AppCompatImageView;
+import androidx.appcompat.content.res.AppCompatResources;
+import androidx.appcompat.widget.AppCompatImageView;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -18,8 +18,8 @@ public class RecordButton extends AppCompatImageView implements View.OnTouchList
 
     private ScaleAnim scaleAnim;
     private RecordView recordView;
-    private boolean listenForRecord = true;
-    private OnRecordClickListener onRecordClickListener;
+    private boolean recordActionListeningEnabled = true;
+    private OnRecordButtonClickListener onRecordButtonClickListener;
 
 
     public void setRecordView(RecordView recordView) {
@@ -88,20 +88,18 @@ public class RecordButton extends AppCompatImageView implements View.OnTouchList
         }
     }
 
-
     private void setTheImageResource(int imageResource) {
         Drawable image = AppCompatResources.getDrawable(getContext(), imageResource);
         setImageDrawable(image);
     }
 
-
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-        if (isListenForRecord()) {
+        if (isRecordActionListeningEnabled()) {
             switch (event.getAction()) {
 
                 case MotionEvent.ACTION_DOWN:
-                    recordView.onActionDown((RecordButton) v, event);
+                    recordView.onActionDown((RecordButton) v);
                     break;
 
 
@@ -116,11 +114,10 @@ public class RecordButton extends AppCompatImageView implements View.OnTouchList
             }
 
         }
-        return isListenForRecord();
+        return isRecordActionListeningEnabled();
 
 
     }
-
 
     protected void startScale() {
         scaleAnim.start();
@@ -130,22 +127,21 @@ public class RecordButton extends AppCompatImageView implements View.OnTouchList
         scaleAnim.stop();
     }
 
-    public void setListenForRecord(boolean listenForRecord) {
-        this.listenForRecord = listenForRecord;
+    public void setRecordActionListeningEnabled(boolean recordActionListeningEnabled) {
+        this.recordActionListeningEnabled = recordActionListeningEnabled;
     }
 
-    public boolean isListenForRecord() {
-        return listenForRecord;
+    public boolean isRecordActionListeningEnabled() {
+        return recordActionListeningEnabled;
     }
 
-    public void setOnRecordClickListener(OnRecordClickListener onRecordClickListener) {
-        this.onRecordClickListener = onRecordClickListener;
+    public void setOnRecordButtonClickListener(OnRecordButtonClickListener onRecordButtonClickListener) {
+        this.onRecordButtonClickListener = onRecordButtonClickListener;
     }
-
 
     @Override
     public void onClick(View v) {
-        if (onRecordClickListener != null)
-            onRecordClickListener.onClick(v);
+        if (onRecordButtonClickListener != null)
+            onRecordButtonClickListener.onClick(v);
     }
 }

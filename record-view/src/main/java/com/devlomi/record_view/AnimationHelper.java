@@ -1,13 +1,12 @@
 package com.devlomi.record_view;
 
-import android.animation.AnimatorInflater;
 import android.animation.AnimatorSet;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Handler;
-import android.support.graphics.drawable.AnimatedVectorDrawableCompat;
-import android.support.graphics.drawable.AnimatorInflaterCompat;
+import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat;
+import androidx.vectordrawable.graphics.drawable.AnimatorInflaterCompat;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AlphaAnimation;
@@ -19,19 +18,19 @@ import android.widget.ImageView;
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 
-public class AnimationHelper {
+class AnimationHelper {
     private Context context;
     private AnimatedVectorDrawableCompat animatedVectorDrawable;
     private ImageView basketImg, smallBlinkingMic;
     private AlphaAnimation alphaAnimation;
-    private OnBasketAnimationEnd onBasketAnimationEndListener;
+    private OnBasketAnimationEndListener onBasketAnimationEndListener;
     private boolean isBasketAnimating, isStartRecorded = false;
     private float micX, micY = 0;
     private AnimatorSet micAnimation;
     private TranslateAnimation translateAnimation1, translateAnimation2;
     private Handler handler1, handler2;
 
-    public AnimationHelper(Context context, ImageView basketImg, ImageView smallBlinkingMic) {
+    AnimationHelper(Context context, ImageView basketImg, ImageView smallBlinkingMic) {
         this.context = context;
         this.smallBlinkingMic = smallBlinkingMic;
         this.basketImg = basketImg;
@@ -39,7 +38,7 @@ public class AnimationHelper {
     }
 
     @SuppressLint("RestrictedApi")
-    public void animateBasket(float basketInitialY) {
+    void animateBasket(float basketInitialY) {
         isBasketAnimating = true;
 
         clearAlphaAnimation(false);
@@ -49,7 +48,6 @@ public class AnimationHelper {
             micX = smallBlinkingMic.getX();
             micY = smallBlinkingMic.getY();
         }
-
 
 
         micAnimation = (AnimatorSet) AnimatorInflaterCompat.loadAnimator(context, R.animator.delete_mic_animation);
@@ -67,12 +65,9 @@ public class AnimationHelper {
         basketImg.setImageDrawable(animatedVectorDrawable);
 
         handler1 = new Handler();
-        handler1.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                basketImg.setVisibility(VISIBLE);
-                basketImg.startAnimation(translateAnimation1);
-            }
+        handler1.postDelayed(() -> {
+            basketImg.setVisibility(VISIBLE);
+            basketImg.startAnimation(translateAnimation1);
         }, 350);
 
         translateAnimation1.setAnimationListener(new Animation.AnimationListener() {
@@ -85,13 +80,10 @@ public class AnimationHelper {
 
                 animatedVectorDrawable.start();
                 handler2 = new Handler();
-                handler2.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        basketImg.startAnimation(translateAnimation2);
-                        smallBlinkingMic.setVisibility(INVISIBLE);
-                        basketImg.setVisibility(INVISIBLE);
-                    }
+                handler2.postDelayed(() -> {
+                    basketImg.startAnimation(translateAnimation2);
+                    smallBlinkingMic.setVisibility(INVISIBLE);
+                    basketImg.setVisibility(INVISIBLE);
                 }, 450);
 
 
@@ -135,7 +127,7 @@ public class AnimationHelper {
 
     //if the user started a new Record while the Animation is running
     // then we want to stop the current animation and revert views back to default state
-    public void resetBasketAnimation() {
+    void resetBasketAnimation() {
         if (isBasketAnimating) {
 
             translateAnimation1.reset();
@@ -166,7 +158,7 @@ public class AnimationHelper {
     }
 
 
-    public void clearAlphaAnimation(boolean hideView) {
+    void clearAlphaAnimation(boolean hideView) {
         alphaAnimation.cancel();
         alphaAnimation.reset();
         smallBlinkingMic.clearAnimation();
@@ -175,7 +167,7 @@ public class AnimationHelper {
         }
     }
 
-    public void animateSmallMicAlpha() {
+    void animateSmallMicAlpha() {
         alphaAnimation = new AlphaAnimation(0.0f, 1.0f);
         alphaAnimation.setDuration(500);
         alphaAnimation.setRepeatMode(Animation.REVERSE);
@@ -183,18 +175,19 @@ public class AnimationHelper {
         smallBlinkingMic.startAnimation(alphaAnimation);
     }
 
-    public void moveRecordButtonAndSlideToCancelBack(final RecordButton recordBtn, FrameLayout slideToCancelLayout, float initialX, float difX) {
+    void moveRecordButtonAndSlideToCancelBack(final RecordButton recordBtn, FrameLayout slideToCancelLayout, float initialX, float difX, boolean isRTL) {
 
         final ValueAnimator positionAnimator =
-                ValueAnimator.ofFloat(recordBtn.getX(), initialX);
+                ValueAnimator.ofFloat(
+                        recordBtn.getX(),
+                        isRTL
+                                ? initialX - recordBtn.getWidth()
+                                : initialX);
 
         positionAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
-        positionAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                float x = (Float) animation.getAnimatedValue();
-                recordBtn.setX(x);
-            }
+        positionAnimator.addUpdateListener(animation -> {
+            float x = (Float) animation.getAnimatedValue();
+            recordBtn.setX(x);
         });
 
         recordBtn.stopScale();
@@ -204,7 +197,9 @@ public class AnimationHelper {
 
         // if the move event was not called ,then the difX will still 0 and there is no need to move it back
         if (difX != 0) {
-            float x = initialX - difX;
+            float x = isRTL
+                    ? initialX + difX - slideToCancelLayout.getWidth()
+                    : initialX - difX;
             slideToCancelLayout.animate()
                     .x(x)
                     .setDuration(0)
@@ -214,24 +209,24 @@ public class AnimationHelper {
 
     }
 
-    public void resetSmallMic() {
+    void resetSmallMic() {
         smallBlinkingMic.setAlpha(1.0f);
         smallBlinkingMic.setScaleX(1.0f);
         smallBlinkingMic.setScaleY(1.0f);
     }
 
-    public void setOnBasketAnimationEndListener(OnBasketAnimationEnd onBasketAnimationEndListener) {
+    void setOnBasketAnimationEndListener(OnBasketAnimationEndListener onBasketAnimationEndListener) {
         this.onBasketAnimationEndListener = onBasketAnimationEndListener;
 
     }
 
-    protected void onAnimationEnd() {
+    void onAnimationEnd() {
         if (onBasketAnimationEndListener != null)
             onBasketAnimationEndListener.onAnimationEnd();
     }
 
     //check if the user started a new Record by pressing the RecordButton
-    public void setStartRecorded(boolean startRecorded) {
+    void setStartRecorded(boolean startRecorded) {
         isStartRecorded = startRecorded;
     }
 

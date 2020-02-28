@@ -1,14 +1,17 @@
 package com.devlomi.record_view;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.os.SystemClock;
-import android.support.annotation.Nullable;
-import android.support.v7.content.res.AppCompatResources;
+import androidx.annotation.Nullable;
+import androidx.appcompat.content.res.AppCompatResources;
+
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +31,8 @@ import io.supercharge.shimmerlayout.ShimmerLayout;
 public class RecordView extends RelativeLayout {
 
     public static final int DEFAULT_CANCEL_BOUNDS = 8; //8dp
+    public static final int DEFAULT_MIN_RECORD_DURATION = 1;
+    public static final int ENDLESS_MAX_RECORD_DURATION = 0;
     private ImageView smallBlinkingMic, basketImg;
     private Chronometer counterTime;
     private TextView slideToCancel;
@@ -37,14 +42,16 @@ public class RecordView extends RelativeLayout {
     private float cancelBounds = DEFAULT_CANCEL_BOUNDS;
     private long startTime, elapsedTime = 0;
     private Context context;
-    private OnRecordListener recordListener;
-    private boolean isSwiped, isLessThanSecondAllowed = false;
+    private OnRecordActionListener recordActionListener;
+    private boolean isSwiped;
     private boolean isSoundEnabled = true;
     private int RECORD_START = R.raw.record_start;
     private int RECORD_FINISHED = R.raw.record_finished;
     private int RECORD_ERROR = R.raw.record_error;
-    private MediaPlayer player;
     private AnimationHelper animationHelper;
+    private int screenWidth;
+    private boolean isRTL;
+    private int minRecordDurationInSeconds = DEFAULT_MIN_RECORD_DURATION, maxRecordDurationInSeconds = ENDLESS_MAX_RECORD_DURATION;
 
 
     public RecordView(Context context) {
@@ -52,7 +59,6 @@ public class RecordView extends RelativeLayout {
         this.context = context;
         init(context, null, -1, -1);
     }
-
 
     public RecordView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -81,6 +87,14 @@ public class RecordView extends RelativeLayout {
         basketImg = view.findViewById(R.id.basket_img);
         slideToCancelLayout = view.findViewById(R.id.shimmer_layout);
 
+        counterTime.setOnChronometerTickListener(chronometer -> {
+            elapsedTime = SystemClock.elapsedRealtime() - chronometer.getBase();
+            if (maxRecordDurationInSeconds > 0 && elapsedTime >= maxRecordDurationInSeconds * 1000) {
+                chronometer.stop();
+                if (recordActionListener != null)
+                    recordActionListener.onMaxDurationReached();
+            }
+        });
 
         hideViews(true);
 
@@ -92,7 +106,7 @@ public class RecordView extends RelativeLayout {
 
             int slideArrowResource = typedArray.getResourceId(R.styleable.RecordView_slide_to_cancel_arrow, -1);
             String slideToCancelText = typedArray.getString(R.styleable.RecordView_slide_to_cancel_text);
-            int slideMarginRight = (int) typedArray.getDimension(R.styleable.RecordView_slide_to_cancel_margin_right, 30);
+            int slideMarginEnd = (int) typedArray.getDimension(R.styleable.RecordView_slide_to_cancel_margin_end, 30);
             int counterTimeColor = typedArray.getColor(R.styleable.RecordView_counter_time_color, -1);
             int arrowColor = typedArray.getColor(R.styleable.RecordView_slide_to_cancel_arrow_color, -1);
 
@@ -100,7 +114,7 @@ public class RecordView extends RelativeLayout {
             int cancelBounds = typedArray.getDimensionPixelSize(R.styleable.RecordView_slide_to_cancel_bounds, -1);
 
             if (cancelBounds != -1)
-                setCancelBounds(cancelBounds, false);//don't convert it to pixels since it's already in pixels
+                setCancelBounds(cancelBounds, false);
 
 
             if (slideArrowResource != -1) {
@@ -119,14 +133,19 @@ public class RecordView extends RelativeLayout {
                 setSlideToCancelArrowColor(arrowColor);
 
 
-
-            setMarginRight(slideMarginRight, true);
+            setMarginEnd(slideMarginEnd, true);
 
             typedArray.recycle();
         }
 
 
         animationHelper = new AnimationHelper(context, basketImg, smallBlinkingMic);
+
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        ((Activity) getContext()).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        screenWidth = displayMetrics.widthPixels;
+
+        isRTL = getContext().getResources().getConfiguration().getLayoutDirection() == View.LAYOUT_DIRECTION_RTL;
 
     }
 
@@ -144,11 +163,9 @@ public class RecordView extends RelativeLayout {
         counterTime.setVisibility(VISIBLE);
     }
 
-
-    private boolean isLessThanOneSecond(long time) {
-        return time <= 1000;
+    private boolean isLessThanMinimumDuration(long time) {
+        return time <= minRecordDurationInSeconds * 1000;
     }
-
 
     private void playSound(int soundRes) {
 
@@ -157,21 +174,14 @@ public class RecordView extends RelativeLayout {
                 return;
 
             try {
-                player = new MediaPlayer();
+                MediaPlayer player = new MediaPlayer();
                 AssetFileDescriptor afd = context.getResources().openRawResourceFd(soundRes);
                 if (afd == null) return;
                 player.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
                 afd.close();
                 player.prepare();
                 player.start();
-                player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-
-                    @Override
-                    public void onCompletion(MediaPlayer mp) {
-                        mp.release();
-                    }
-
-                });
+                player.setOnCompletionListener(MediaPlayer::release);
                 player.setLooping(false);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -182,10 +192,9 @@ public class RecordView extends RelativeLayout {
     }
 
 
-    protected void onActionDown(RecordButton recordBtn, MotionEvent motionEvent) {
-
-        if (recordListener != null)
-            recordListener.onStart();
+    protected void onActionDown(RecordButton recordBtn) {
+        if (recordActionListener != null)
+            recordActionListener.onStart();
 
 
         animationHelper.setStartRecorded(true);
@@ -196,7 +205,9 @@ public class RecordView extends RelativeLayout {
         recordBtn.startScale();
         slideToCancelLayout.startShimmerAnimation();
 
-        initialX = recordBtn.getX();
+        initialX = isRTL
+                ? recordBtn.getX() + recordBtn.getWidth()
+                : recordBtn.getX();
 
         basketInitialY = basketImg.getY() + 90;
 
@@ -212,19 +223,20 @@ public class RecordView extends RelativeLayout {
 
     }
 
-
     protected void onActionMove(RecordButton recordBtn, MotionEvent motionEvent) {
-
-
         long time = System.currentTimeMillis() - startTime;
 
         if (!isSwiped) {
 
             //Swipe To Cancel
-            if (slideToCancelLayout.getX() != 0 && slideToCancelLayout.getX() <= counterTime.getRight() + cancelBounds) {
-
+            boolean shouldStartCancelAnimation = isRTL
+                    ? slideToCancelLayout.getX() + slideToCancelLayout.getWidth() != screenWidth
+                    && slideToCancelLayout.getX() + slideToCancelLayout.getWidth() >= counterTime.getLeft() - cancelBounds
+                    : slideToCancelLayout.getX() != 0
+                    && slideToCancelLayout.getX() <= counterTime.getRight() + cancelBounds;
+            if (shouldStartCancelAnimation) {
                 //if the time was less than one second then do not start basket animation
-                if (isLessThanOneSecond(time)) {
+                if (isLessThanMinimumDuration(time)) {
                     hideViews(true);
                     animationHelper.clearAlphaAnimation(false);
 
@@ -236,7 +248,7 @@ public class RecordView extends RelativeLayout {
                     animationHelper.animateBasket(basketInitialY);
                 }
 
-                animationHelper.moveRecordButtonAndSlideToCancelBack(recordBtn, slideToCancelLayout, initialX, difX);
+                animationHelper.moveRecordButtonAndSlideToCancelBack(recordBtn, slideToCancelLayout, initialX, difX, isRTL);
 
                 counterTime.stop();
                 slideToCancelLayout.stopShimmerAnimation();
@@ -245,27 +257,36 @@ public class RecordView extends RelativeLayout {
 
                 animationHelper.setStartRecorded(false);
 
-                if (recordListener != null)
-                    recordListener.onCancel();
+                if (recordActionListener != null)
+                    recordActionListener.onCancel();
 
 
             } else {
 
 
                 //if statement is to Prevent Swiping out of bounds
-                if (motionEvent.getRawX() < initialX) {
+                boolean isSwiped = isRTL
+                        ? motionEvent.getRawX() > initialX
+                        : motionEvent.getRawX() < initialX;
+                if (isSwiped) {
                     recordBtn.animate()
-                            .x(motionEvent.getRawX())
+                            .x(isRTL
+                                    ? motionEvent.getRawX() - recordBtn.getWidth()
+                                    : motionEvent.getRawX())
                             .setDuration(0)
                             .start();
 
 
                     if (difX == 0)
-                        difX = (initialX - slideToCancelLayout.getX());
+                        difX = isRTL
+                                ? (slideToCancelLayout.getX() + slideToCancelLayout.getWidth() - initialX)
+                                : (initialX - slideToCancelLayout.getX());
 
 
                     slideToCancelLayout.animate()
-                            .x(motionEvent.getRawX() - difX)
+                            .x(isRTL
+                                    ? motionEvent.getRawX() + difX - slideToCancelLayout.getWidth()
+                                    : motionEvent.getRawX() - difX)
                             .setDuration(0)
                             .start();
 
@@ -280,11 +301,9 @@ public class RecordView extends RelativeLayout {
 
     protected void onActionUp(RecordButton recordBtn) {
 
-        elapsedTime = System.currentTimeMillis() - startTime;
-
-        if (!isLessThanSecondAllowed && isLessThanOneSecond(elapsedTime) && !isSwiped) {
-            if (recordListener != null)
-                recordListener.onLessThanSecond();
+        if (isLessThanMinimumDuration(elapsedTime) && !isSwiped) {
+            if (recordActionListener != null)
+                recordActionListener.onLessThanMinimumDuration();
 
             animationHelper.setStartRecorded(false);
 
@@ -292,8 +311,8 @@ public class RecordView extends RelativeLayout {
 
 
         } else {
-            if (recordListener != null && !isSwiped)
-                recordListener.onFinish(elapsedTime);
+            if (recordActionListener != null && !isSwiped)
+                recordActionListener.onFinish(elapsedTime);
 
             animationHelper.setStartRecorded(false);
 
@@ -311,7 +330,7 @@ public class RecordView extends RelativeLayout {
         if (!isSwiped)
             animationHelper.clearAlphaAnimation(true);
 
-        animationHelper.moveRecordButtonAndSlideToCancelBack(recordBtn, slideToCancelLayout, initialX, difX);
+        animationHelper.moveRecordButtonAndSlideToCancelBack(recordBtn, slideToCancelLayout, initialX, difX, isRTL);
         counterTime.stop();
         slideToCancelLayout.stopShimmerAnimation();
 
@@ -319,31 +338,33 @@ public class RecordView extends RelativeLayout {
     }
 
 
-    private void setMarginRight(int marginRight, boolean convertToDp) {
+    private void setMarginEnd(int marginEnd, boolean convertToDp) {
         RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) slideToCancelLayout.getLayoutParams();
         if (convertToDp) {
-            layoutParams.rightMargin = (int) DpUtil.toPixel(marginRight, context);
+            layoutParams.setMarginEnd((int) DpUtil.toPixel(marginEnd, context));
         } else
-            layoutParams.rightMargin = marginRight;
+            layoutParams.setMarginEnd(marginEnd);
 
         slideToCancelLayout.setLayoutParams(layoutParams);
     }
 
-
-    public void setOnRecordListener(OnRecordListener recrodListener) {
-        this.recordListener = recrodListener;
+    private void setCancelBounds(float cancelBounds, boolean convertDpToPixel) {
+        this.cancelBounds = convertDpToPixel ? DpUtil.toPixel(cancelBounds, context) : cancelBounds;
     }
 
-    public void setOnBasketAnimationEndListener(OnBasketAnimationEnd onBasketAnimationEndListener) {
+
+    // public setters and getters
+
+    public void setOnRecordListener(OnRecordActionListener recordActionListener) {
+        this.recordActionListener = recordActionListener;
+    }
+
+    public void setOnBasketAnimationEndListener(OnBasketAnimationEndListener onBasketAnimationEndListener) {
         animationHelper.setOnBasketAnimationEndListener(onBasketAnimationEndListener);
     }
 
     public void setSoundEnabled(boolean isEnabled) {
         isSoundEnabled = isEnabled;
-    }
-
-    public void setLessThanSecondAllowed(boolean isAllowed) {
-        isLessThanSecondAllowed = isAllowed;
     }
 
     public void setSlideToCancelText(String text) {
@@ -362,10 +383,13 @@ public class RecordView extends RelativeLayout {
         smallBlinkingMic.setImageResource(icon);
     }
 
-    public void setSlideMarginRight(int marginRight) {
-        setMarginRight(marginRight, true);
+    public void setSlideMarginEndInDp(int marginEnd) {
+        setMarginEnd(marginEnd, true);
     }
 
+    public void setCancelBoundsInDP(float cancelBounds) {
+        setCancelBounds(cancelBounds, true);
+    }
 
     public void setCustomSounds(int startSound, int finishedSound, int errorSound) {
         //0 means do not play sound
@@ -374,29 +398,40 @@ public class RecordView extends RelativeLayout {
         RECORD_ERROR = errorSound;
     }
 
+    public void setCounterTimeColor(int color) {
+        counterTime.setTextColor(color);
+    }
+
+    public void setSlideToCancelArrowColor(int color) {
+        arrow.setColorFilter(color);
+    }
+
+    public void setMinRecordDurationInSeconds(int minRecordDurationInSeconds) throws RecordDurationBoundariesException {
+        if (minRecordDurationInSeconds <= 0
+                || (maxRecordDurationInSeconds != ENDLESS_MAX_RECORD_DURATION && maxRecordDurationInSeconds <= minRecordDurationInSeconds))
+            throw new RecordDurationBoundariesException();
+        this.minRecordDurationInSeconds = minRecordDurationInSeconds;
+    }
+
+    public void setRecordDurationBoundsInSeconds(int minRecordDurationInSeconds, int maxRecordDurationInSeconds) throws RecordDurationBoundariesException {
+        if (minRecordDurationInSeconds <= 0
+                || (maxRecordDurationInSeconds != ENDLESS_MAX_RECORD_DURATION && maxRecordDurationInSeconds <= minRecordDurationInSeconds))
+            throw new RecordDurationBoundariesException();
+        this.minRecordDurationInSeconds = minRecordDurationInSeconds;
+        this.maxRecordDurationInSeconds = maxRecordDurationInSeconds;
+    }
+
     public float getCancelBounds() {
         return cancelBounds;
     }
 
-    public void setCancelBounds(float cancelBounds) {
-        setCancelBounds(cancelBounds, true);
+    public int getMinRecordDurationInSeconds() {
+        return minRecordDurationInSeconds;
     }
 
-    //set Chronometer color
-    public void setCounterTimeColor(int color) {
-        counterTime.setTextColor(color);
+    public int getMaxRecordDurationInSeconds() {
+        return maxRecordDurationInSeconds;
     }
-    
-    public void setSlideToCancelArrowColor(int color){
-        arrow.setColorFilter(color);
-    }
-
-
-    private void setCancelBounds(float cancelBounds, boolean convertDpToPixel) {
-        float bounds = convertDpToPixel ? DpUtil.toPixel(cancelBounds, context) : cancelBounds;
-        this.cancelBounds = bounds;
-    }
-
 }
 
 
