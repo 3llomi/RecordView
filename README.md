@@ -84,7 +84,7 @@ Forked from [3llomi/RecordView](https://github.com/3llomi/RecordView)
 
 ```java
 
-    recordView.setOnRecordListener(new OnRecordActionListener() {
+    recordView.setOnRecordActionListener(new OnRecordActionListener() {
             @Override
             public void onStart() {
                 Toast.makeText(MainActivity.this, "OnStart", Toast.LENGTH_SHORT).show();

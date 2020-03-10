@@ -1,24 +1,21 @@
 package com.devlomi.record_view;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.os.SystemClock;
-import androidx.annotation.Nullable;
-import androidx.appcompat.content.res.AppCompatResources;
-
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Chronometer;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.content.res.AppCompatResources;
 
 import java.io.IOException;
 
@@ -49,7 +46,6 @@ public class RecordView extends RelativeLayout {
     private int RECORD_FINISHED = R.raw.record_finished;
     private int RECORD_ERROR = R.raw.record_error;
     private AnimationHelper animationHelper;
-    private int screenWidth;
     private boolean isRTL;
     private int minRecordDurationInSeconds = DEFAULT_MIN_RECORD_DURATION, maxRecordDurationInSeconds = ENDLESS_MAX_RECORD_DURATION;
 
@@ -73,19 +69,18 @@ public class RecordView extends RelativeLayout {
     }
 
     private void init(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        View view = View.inflate(context, R.layout.record_view_layout, null);
-        addView(view);
+        isRTL = getContext().getResources().getConfiguration().getLayoutDirection() == View.LAYOUT_DIRECTION_RTL;
 
+        inflate(context, R.layout.record_view_layout, this);
 
-        ViewGroup viewGroup = (ViewGroup) view.getParent();
-        viewGroup.setClipChildren(false);
+        setClipChildren(false);
 
-        arrow = view.findViewById(R.id.arrow);
-        slideToCancel = view.findViewById(R.id.slide_to_cancel);
-        smallBlinkingMic = view.findViewById(R.id.glowing_mic);
-        counterTime = view.findViewById(R.id.counter_tv);
-        basketImg = view.findViewById(R.id.basket_img);
-        slideToCancelLayout = view.findViewById(R.id.shimmer_layout);
+        arrow = findViewById(R.id.arrow);
+        slideToCancel = findViewById(R.id.slide_to_cancel);
+        smallBlinkingMic = findViewById(R.id.glowing_mic);
+        counterTime = findViewById(R.id.counter_tv);
+        basketImg = findViewById(R.id.basket_img);
+        slideToCancelLayout = findViewById(R.id.shimmer_layout);
 
         counterTime.setOnChronometerTickListener(chronometer -> {
             elapsedTime = SystemClock.elapsedRealtime() - chronometer.getBase();
@@ -140,12 +135,6 @@ public class RecordView extends RelativeLayout {
 
 
         animationHelper = new AnimationHelper(context, basketImg, smallBlinkingMic);
-
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        ((Activity) getContext()).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        screenWidth = displayMetrics.widthPixels;
-
-        isRTL = getContext().getResources().getConfiguration().getLayoutDirection() == View.LAYOUT_DIRECTION_RTL;
 
     }
 
@@ -230,7 +219,7 @@ public class RecordView extends RelativeLayout {
 
             //Swipe To Cancel
             boolean shouldStartCancelAnimation = isRTL
-                    ? slideToCancelLayout.getX() + slideToCancelLayout.getWidth() != screenWidth
+                    ? slideToCancelLayout.getX() != 0
                     && slideToCancelLayout.getX() + slideToCancelLayout.getWidth() >= counterTime.getLeft() - cancelBounds
                     : slideToCancelLayout.getX() != 0
                     && slideToCancelLayout.getX() <= counterTime.getRight() + cancelBounds;
@@ -339,7 +328,7 @@ public class RecordView extends RelativeLayout {
 
 
     private void setMarginEnd(int marginEnd, boolean convertToDp) {
-        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) slideToCancelLayout.getLayoutParams();
+        LayoutParams layoutParams = (LayoutParams) slideToCancelLayout.getLayoutParams();
         if (convertToDp) {
             layoutParams.setMarginEnd((int) DpUtil.toPixel(marginEnd, context));
         } else
@@ -355,7 +344,7 @@ public class RecordView extends RelativeLayout {
 
     // public setters and getters
 
-    public void setOnRecordListener(OnRecordActionListener recordActionListener) {
+    public void setOnRecordActionListener(OnRecordActionListener recordActionListener) {
         this.recordActionListener = recordActionListener;
     }
 

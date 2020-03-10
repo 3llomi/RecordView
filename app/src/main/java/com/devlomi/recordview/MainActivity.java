@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
         recordView.setCustomSounds(R.raw.record_start, R.raw.record_finished, 0);
 
 
-        recordView.setOnRecordListener(new OnRecordActionListener() {
+        recordView.setOnRecordActionListener(new OnRecordActionListener() {
             @Override
             public void onStart() {
                 Toast.makeText(MainActivity.this, "OnStart", Toast.LENGTH_SHORT).show();
