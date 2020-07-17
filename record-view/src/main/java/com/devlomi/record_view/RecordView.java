@@ -221,7 +221,7 @@ public class RecordView extends RelativeLayout {
         if (!isSwiped) {
 
             //Swipe To Cancel
-            if (slideToCancelLayout.getX() != 0 && slideToCancelLayout.getX() <= counterTime.getRight() + cancelBounds) {
+            if (slideToCancelLayout.getX() != 0 && (slideToCancelLayout.getX() +slideToCancelLayout.getWidth()) >= counterTime.getX() - cancelBounds) {
 
                 //if the time was less than one second then do not start basket animation
                 if (isLessThanOneSecond(time)) {
@@ -253,7 +253,7 @@ public class RecordView extends RelativeLayout {
 
 
                 //if statement is to Prevent Swiping out of bounds
-                if (motionEvent.getRawX() < initialX) {
+                if (motionEvent.getRawX() > initialX) {
                     recordBtn.animate()
                             .x(motionEvent.getRawX())
                             .setDuration(0)
