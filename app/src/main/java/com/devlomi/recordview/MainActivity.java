@@ -1,7 +1,12 @@
 package com.devlomi.recordview;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.media.MediaPlayer;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -18,6 +23,8 @@ import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
 
+
+    private static final int EXTERNAL_STORAGE_MIC_PERMISSION = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,19 +98,37 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFinish(long recordTime) {
+            public void onFinish(long recordTime, String recordingPath) {
 
                 String time = getHumanTimeText(recordTime);
                 Toast.makeText(MainActivity.this, "onFinishRecord - Recorded Time is: " + time, Toast.LENGTH_SHORT).show();
                 Log.d("RecordView", "onFinish");
 
                 Log.d("RecordTime", time);
+
             }
 
             @Override
             public void onLessThanSecond() {
                 Toast.makeText(MainActivity.this, "OnLessThanSecond", Toast.LENGTH_SHORT).show();
                 Log.d("RecordView", "onLessThanSecond");
+            }
+
+            @Override
+            public boolean isPermissionAvailable() {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED&&
+                            ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+                        Log.v("TAG", "Permission is granted");
+                        return true;
+                    } else {
+                        Log.v("TAG", "Permission is revoked");
+                        ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.RECORD_AUDIO}, EXTERNAL_STORAGE_MIC_PERMISSION);
+                        return false;
+                    }
+                } else {
+                    return true;
+                }
             }
         });
 

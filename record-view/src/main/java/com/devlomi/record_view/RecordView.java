@@ -5,6 +5,7 @@ import android.content.res.AssetFileDescriptor;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
+import android.media.MediaRecorder;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v7.content.res.AppCompatResources;
@@ -28,6 +29,7 @@ import io.supercharge.shimmerlayout.ShimmerLayout;
 public class RecordView extends RelativeLayout {
 
     public static final int DEFAULT_CANCEL_BOUNDS = 8; //8dp
+    private static final String TEMP_FILE_NAME = "/temprecording.3gp";
     private ImageView smallBlinkingMic, basketImg;
     private Chronometer counterTime;
     private TextView slideToCancel;
@@ -45,12 +47,14 @@ public class RecordView extends RelativeLayout {
     private int RECORD_ERROR = R.raw.record_error;
     private MediaPlayer player;
     private AnimationHelper animationHelper;
-
+    MediaRecorder recorder;
+    final String path;
 
     public RecordView(Context context) {
         super(context);
         this.context = context;
         init(context, null, -1, -1);
+        path = recordingPath();
     }
 
 
@@ -58,12 +62,14 @@ public class RecordView extends RelativeLayout {
         super(context, attrs);
         this.context = context;
         init(context, attrs, -1, -1);
+        path = recordingPath();
     }
 
     public RecordView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         this.context = context;
         init(context, attrs, defStyleAttr, -1);
+        path = recordingPath();
     }
 
     private void init(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
@@ -119,7 +125,6 @@ public class RecordView extends RelativeLayout {
                 setSlideToCancelArrowColor(arrowColor);
 
 
-
             setMarginRight(slideMarginRight, true);
 
             typedArray.recycle();
@@ -142,6 +147,10 @@ public class RecordView extends RelativeLayout {
         slideToCancelLayout.setVisibility(VISIBLE);
         smallBlinkingMic.setVisibility(VISIBLE);
         counterTime.setVisibility(VISIBLE);
+    }
+
+    private String recordingPath() {
+        return context.getExternalCacheDir() + TEMP_FILE_NAME;
     }
 
 
@@ -184,8 +193,20 @@ public class RecordView extends RelativeLayout {
 
     protected void onActionDown(RecordButton recordBtn, MotionEvent motionEvent) {
 
-        if (recordListener != null)
+        if (recordListener != null&&recordListener.isPermissionAvailable()) {
             recordListener.onStart();
+            try {
+                recorder = new MediaRecorder();
+                recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+                recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+                recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+                recorder.setOutputFile(path);
+                recorder.prepare();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            recorder.start();
+        }
 
 
         animationHelper.setStartRecorded(true);
@@ -212,6 +233,14 @@ public class RecordView extends RelativeLayout {
 
     }
 
+    public void stopRecorder() {
+        if (recorder != null) {
+            recorder.stop();
+            recorder.release();
+            recorder = null;
+        }
+    }
+
 
     protected void onActionMove(RecordButton recordBtn, MotionEvent motionEvent) {
 
@@ -221,7 +250,7 @@ public class RecordView extends RelativeLayout {
         if (!isSwiped) {
 
             //Swipe To Cancel
-            if (slideToCancelLayout.getX() != 0 && (slideToCancelLayout.getX() +slideToCancelLayout.getWidth()) >= counterTime.getX() - cancelBounds) {
+            if (slideToCancelLayout.getX() != 0 && (slideToCancelLayout.getX() + slideToCancelLayout.getWidth()) >= counterTime.getX() - cancelBounds) {
 
                 //if the time was less than one second then do not start basket animation
                 if (isLessThanOneSecond(time)) {
@@ -245,9 +274,10 @@ public class RecordView extends RelativeLayout {
 
                 animationHelper.setStartRecorded(false);
 
-                if (recordListener != null)
+                if (recordListener != null) {
                     recordListener.onCancel();
-
+                    stopRecorder();
+                }
 
             } else {
 
@@ -292,8 +322,10 @@ public class RecordView extends RelativeLayout {
 
 
         } else {
-            if (recordListener != null && !isSwiped)
-                recordListener.onFinish(elapsedTime);
+            if (recordListener != null && !isSwiped) {
+                recordListener.onFinish(elapsedTime, recordingPath());
+                stopRecorder();
+            }
 
             animationHelper.setStartRecorded(false);
 
@@ -386,8 +418,8 @@ public class RecordView extends RelativeLayout {
     public void setCounterTimeColor(int color) {
         counterTime.setTextColor(color);
     }
-    
-    public void setSlideToCancelArrowColor(int color){
+
+    public void setSlideToCancelArrowColor(int color) {
         arrow.setColorFilter(color);
     }
 
