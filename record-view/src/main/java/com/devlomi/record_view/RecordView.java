@@ -6,6 +6,7 @@ import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
+import android.os.Environment;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v7.content.res.AppCompatResources;
@@ -18,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.io.File;
 import java.io.IOException;
 
 import io.supercharge.shimmerlayout.ShimmerLayout;
@@ -150,7 +152,7 @@ public class RecordView extends RelativeLayout {
     }
 
     private String recordingPath() {
-        return context.getExternalCacheDir() + TEMP_FILE_NAME;
+        return context.getCacheDir() + TEMP_FILE_NAME;
     }
 
 
@@ -313,8 +315,10 @@ public class RecordView extends RelativeLayout {
         elapsedTime = System.currentTimeMillis() - startTime;
 
         if (!isLessThanSecondAllowed && isLessThanOneSecond(elapsedTime) && !isSwiped) {
-            if (recordListener != null)
+            if (recordListener != null) {
                 recordListener.onLessThanSecond();
+                stopRecorder();
+            }
 
             animationHelper.setStartRecorded(false);
 
@@ -323,8 +327,9 @@ public class RecordView extends RelativeLayout {
 
         } else {
             if (recordListener != null && !isSwiped) {
-                recordListener.onFinish(elapsedTime, recordingPath());
+
                 stopRecorder();
+                recordListener.onFinish(elapsedTime, new File(recordingPath()));
             }
 
             animationHelper.setStartRecorded(false);

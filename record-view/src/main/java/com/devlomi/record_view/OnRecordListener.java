@@ -1,5 +1,7 @@
 package com.devlomi.record_view;
 
+import java.io.File;
+
 /**
  * Created by Devlomi on 24/08/2017.
  */
@@ -7,7 +9,7 @@ package com.devlomi.record_view;
 public interface OnRecordListener {
     void onStart();
     void onCancel();
-    void onFinish(long recordTime, String recordingPath);
+    void onFinish(long recordTime, File recordingPath);
     void onLessThanSecond();
     boolean isPermissionAvailable();
 }

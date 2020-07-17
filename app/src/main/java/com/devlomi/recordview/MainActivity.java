@@ -19,6 +19,7 @@ import com.devlomi.record_view.OnRecordListener;
 import com.devlomi.record_view.RecordButton;
 import com.devlomi.record_view.RecordView;
 
+import java.io.File;
 import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
@@ -98,13 +99,22 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFinish(long recordTime, String recordingPath) {
+            public void onFinish(long recordTime, File recordingFile) {
 
                 String time = getHumanTimeText(recordTime);
                 Toast.makeText(MainActivity.this, "onFinishRecord - Recorded Time is: " + time, Toast.LENGTH_SHORT).show();
                 Log.d("RecordView", "onFinish");
 
                 Log.d("RecordTime", time);
+                MediaPlayer mp = new MediaPlayer();
+
+                try {
+                    mp.setDataSource(recordingFile.getPath());
+                    mp.prepare();
+                    mp.start();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
             }
 
