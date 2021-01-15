@@ -119,8 +119,7 @@ public class RecordView extends RelativeLayout {
                 setSlideToCancelArrowColor(arrowColor);
 
 
-
-            setMarginRight(slideMarginRight, true);
+            setLeftMargin(slideMarginRight, true);
 
             typedArray.recycle();
         }
@@ -177,8 +176,6 @@ public class RecordView extends RelativeLayout {
                 e.printStackTrace();
             }
         }
-
-
     }
 
 
@@ -187,16 +184,14 @@ public class RecordView extends RelativeLayout {
         if (recordListener != null)
             recordListener.onStart();
 
-
         animationHelper.setStartRecorded(true);
         animationHelper.resetBasketAnimation();
         animationHelper.resetSmallMic();
 
-
         recordBtn.startScale();
         slideToCancelLayout.startShimmerAnimation();
 
-        initialX = recordBtn.getX();
+        initialX = recordBtn.getX() + recordBtn.getWidth();
 
         basketInitialY = basketImg.getY() + 90;
 
@@ -214,23 +209,18 @@ public class RecordView extends RelativeLayout {
 
 
     protected void onActionMove(RecordButton recordBtn, MotionEvent motionEvent) {
-
-
         long time = System.currentTimeMillis() - startTime;
 
         if (!isSwiped) {
-
             //Swipe To Cancel
-            if (slideToCancelLayout.getX() != 0 && slideToCancelLayout.getX() <= counterTime.getRight() + cancelBounds) {
+            if (slideToCancelLayout.getX() != 0
+                    && slideToCancelLayout.getX() + slideToCancelLayout.getWidth() >= counterTime.getX() - cancelBounds) {
 
                 //if the time was less than one second then do not start basket animation
                 if (isLessThanOneSecond(time)) {
                     hideViews(true);
                     animationHelper.clearAlphaAnimation(false);
-
-
                     animationHelper.onAnimationEnd();
-
                 } else {
                     hideViews(false);
                     animationHelper.animateBasket(basketInitialY);
@@ -242,39 +232,28 @@ public class RecordView extends RelativeLayout {
                 slideToCancelLayout.stopShimmerAnimation();
                 isSwiped = true;
 
-
                 animationHelper.setStartRecorded(false);
 
                 if (recordListener != null)
                     recordListener.onCancel();
-
-
             } else {
-
-
                 //if statement is to Prevent Swiping out of bounds
-                if (motionEvent.getRawX() < initialX) {
+                if (motionEvent.getRawX() > initialX) {
                     recordBtn.animate()
-                            .x(motionEvent.getRawX())
+                            .x(motionEvent.getRawX() - recordBtn.getWidth())
                             .setDuration(0)
                             .start();
 
-
                     if (difX == 0)
-                        difX = (initialX - slideToCancelLayout.getX());
+                        difX = (slideToCancelLayout.getX() + slideToCancelLayout.getWidth() - initialX);
 
 
                     slideToCancelLayout.animate()
-                            .x(motionEvent.getRawX() - difX)
+                            .x((motionEvent.getRawX() + difX) - slideToCancelLayout.getWidth())
                             .setDuration(0)
                             .start();
-
-
                 }
-
-
             }
-
         }
     }
 
@@ -285,11 +264,8 @@ public class RecordView extends RelativeLayout {
         if (!isLessThanSecondAllowed && isLessThanOneSecond(elapsedTime) && !isSwiped) {
             if (recordListener != null)
                 recordListener.onLessThanSecond();
-
             animationHelper.setStartRecorded(false);
-
             playSound(RECORD_ERROR);
-
 
         } else {
             if (recordListener != null && !isSwiped)
@@ -319,12 +295,12 @@ public class RecordView extends RelativeLayout {
     }
 
 
-    private void setMarginRight(int marginRight, boolean convertToDp) {
+    private void setLeftMargin(int marginRight, boolean convertToDp) {
         RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) slideToCancelLayout.getLayoutParams();
         if (convertToDp) {
-            layoutParams.rightMargin = (int) DpUtil.toPixel(marginRight, context);
+            layoutParams.leftMargin = (int) DpUtil.toPixel(marginRight, context);
         } else
-            layoutParams.rightMargin = marginRight;
+            layoutParams.leftMargin = marginRight;
 
         slideToCancelLayout.setLayoutParams(layoutParams);
     }
@@ -363,7 +339,7 @@ public class RecordView extends RelativeLayout {
     }
 
     public void setSlideMarginRight(int marginRight) {
-        setMarginRight(marginRight, true);
+        setLeftMargin(marginRight, true);
     }
 
 
@@ -386,8 +362,8 @@ public class RecordView extends RelativeLayout {
     public void setCounterTimeColor(int color) {
         counterTime.setTextColor(color);
     }
-    
-    public void setSlideToCancelArrowColor(int color){
+
+    public void setSlideToCancelArrowColor(int color) {
         arrow.setColorFilter(color);
     }
 

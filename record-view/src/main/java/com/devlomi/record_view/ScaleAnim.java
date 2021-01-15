@@ -38,7 +38,6 @@ public class ScaleAnim {
 //        scaleX.setDuration(250);
 //        scaleX.setInterpolator(new DecelerateInterpolator());
 
-
         set.setDuration(150);
         set.setInterpolator(new AccelerateDecelerateInterpolator());
         set.playTogether(scaleY, scaleX);
