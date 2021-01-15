@@ -114,11 +114,8 @@ public class RecordButton extends AppCompatImageView implements View.OnTouchList
                     break;
 
             }
-
         }
         return isListenForRecord();
-
-
     }
 
 

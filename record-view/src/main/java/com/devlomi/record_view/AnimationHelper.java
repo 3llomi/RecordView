@@ -51,7 +51,6 @@ public class AnimationHelper {
         }
 
 
-
         micAnimation = (AnimatorSet) AnimatorInflaterCompat.loadAnimator(context, R.animator.delete_mic_animation);
         micAnimation.setTarget(smallBlinkingMic); // set the view you want to animate
 
@@ -193,7 +192,7 @@ public class AnimationHelper {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
                 float x = (Float) animation.getAnimatedValue();
-                recordBtn.setX(x);
+                recordBtn.setX(x - recordBtn.getWidth());
             }
         });
 
@@ -204,14 +203,12 @@ public class AnimationHelper {
 
         // if the move event was not called ,then the difX will still 0 and there is no need to move it back
         if (difX != 0) {
-            float x = initialX - difX;
+            float x = initialX + difX;
             slideToCancelLayout.animate()
-                    .x(x)
+                    .x(x-slideToCancelLayout.getWidth())
                     .setDuration(0)
                     .start();
         }
-
-
     }
 
     public void resetSmallMic() {

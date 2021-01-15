@@ -79,7 +79,6 @@ public class MainActivity extends AppCompatActivity {
             public void onStart() {
                 Log.d("RecordView", "onStart");
                 Toast.makeText(MainActivity.this, "OnStartRecord", Toast.LENGTH_SHORT).show();
-
             }
 
             @Override
