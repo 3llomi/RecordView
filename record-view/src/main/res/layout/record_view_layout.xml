@@ -44,7 +44,8 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:layout_centerInParent="true"
-        android:layout_marginRight="8dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginRight="24dp"
         app:srcCompat="@drawable/recv_ic_mic" />
 
     <ImageView
@@ -54,8 +55,8 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:layout_centerInParent="true"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp" />
+        android:layout_marginEnd="24dp"
+        android:layout_marginRight="24dp" />
 
     <Chronometer
         android:id="@+id/counter_tv"
