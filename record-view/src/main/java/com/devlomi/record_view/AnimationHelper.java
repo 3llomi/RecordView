@@ -1,13 +1,10 @@
 package com.devlomi.record_view;
 
-import android.animation.AnimatorInflater;
 import android.animation.AnimatorSet;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Handler;
-import android.support.graphics.drawable.AnimatedVectorDrawableCompat;
-import android.support.graphics.drawable.AnimatorInflaterCompat;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AlphaAnimation;
@@ -15,6 +12,9 @@ import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+
+import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat;
+import androidx.vectordrawable.graphics.drawable.AnimatorInflaterCompat;
 
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
@@ -49,7 +49,6 @@ public class AnimationHelper {
             micX = smallBlinkingMic.getX();
             micY = smallBlinkingMic.getY();
         }
-
 
 
         micAnimation = (AnimatorSet) AnimatorInflaterCompat.loadAnimator(context, R.animator.delete_mic_animation);
@@ -155,7 +154,7 @@ public class AnimationHelper {
                 handler2.removeCallbacksAndMessages(null);
 
             basketImg.setVisibility(INVISIBLE);
-            smallBlinkingMic.setX(micX);
+            smallBlinkingMic.setX( micX);
             smallBlinkingMic.setY(micY);
             smallBlinkingMic.setVisibility(View.GONE);
 
@@ -193,7 +192,7 @@ public class AnimationHelper {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
                 float x = (Float) animation.getAnimatedValue();
-                recordBtn.setX(x);
+                recordBtn.setX(x - recordBtn.getWidth());
             }
         });
 
@@ -204,14 +203,12 @@ public class AnimationHelper {
 
         // if the move event was not called ,then the difX will still 0 and there is no need to move it back
         if (difX != 0) {
-            float x = initialX - difX;
+            float x = initialX + difX;
             slideToCancelLayout.animate()
-                    .x(x)
+                    .x(x-slideToCancelLayout.getWidth())
                     .setDuration(0)
                     .start();
         }
-
-
     }
 
     public void resetSmallMic() {
