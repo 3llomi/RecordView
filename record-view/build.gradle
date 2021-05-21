@@ -27,18 +27,18 @@ dependencies {
     testImplementation 'junit:junit:4.12'
 }
 
-//afterEvaluate {
-//    publishing {
-//        publications {
-//            // Creates a Maven publication called "release".
-//            release(MavenPublication) {
-//                // Applies the component for the release build variant.
-//                from components.release
-//                // You can then customize attributes of the publication as shown below.
-//                groupId = 'com.devlomi.record-view'
-//                artifactId = 'record-view'
-//                version = '3.0.0'
-//            }
-//        }
-//    }
-//}
+afterEvaluate {
+    publishing {
+        publications {
+            // Creates a Maven publication called "release".
+            release(MavenPublication) {
+                // Applies the component for the release build variant.
+                from components.release
+                // You can then customize attributes of the publication as shown below.
+                groupId = 'com.devlomi.record-view'
+                artifactId = 'record-view'
+                version = '3.0.1'
+            }
+        }
+    }
+}
