@@ -1,13 +1,11 @@
 package com.devlomi.record_view;
 
-import android.animation.AnimatorInflater;
 import android.animation.AnimatorSet;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.PorterDuff;
 import android.os.Handler;
-import android.support.graphics.drawable.AnimatedVectorDrawableCompat;
-import android.support.graphics.drawable.AnimatorInflaterCompat;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AlphaAnimation;
@@ -15,6 +13,9 @@ import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+
+import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat;
+import androidx.vectordrawable.graphics.drawable.AnimatorInflaterCompat;
 
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
@@ -30,12 +31,23 @@ public class AnimationHelper {
     private AnimatorSet micAnimation;
     private TranslateAnimation translateAnimation1, translateAnimation2;
     private Handler handler1, handler2;
+    private boolean recordButtonGrowingAnimationEnabled;
 
-    public AnimationHelper(Context context, ImageView basketImg, ImageView smallBlinkingMic) {
+
+    public AnimationHelper(Context context, ImageView basketImg, ImageView smallBlinkingMic, boolean recordButtonGrowingAnimationEnabled) {
         this.context = context;
         this.smallBlinkingMic = smallBlinkingMic;
         this.basketImg = basketImg;
         animatedVectorDrawable = AnimatedVectorDrawableCompat.create(context, R.drawable.recv_basket_animated);
+        this.recordButtonGrowingAnimationEnabled = recordButtonGrowingAnimationEnabled;
+    }
+
+    public void setTrashIconColor(int color) {
+        animatedVectorDrawable.setColorFilter(color, PorterDuff.Mode.SRC_IN);
+    }
+
+    public void setRecordButtonGrowingAnimationEnabled(boolean recordButtonGrowingAnimationEnabled) {
+        this.recordButtonGrowingAnimationEnabled = recordButtonGrowingAnimationEnabled;
     }
 
     @SuppressLint("RestrictedApi")
@@ -49,7 +61,6 @@ public class AnimationHelper {
             micX = smallBlinkingMic.getX();
             micY = smallBlinkingMic.getY();
         }
-
 
 
         micAnimation = (AnimatorSet) AnimatorInflaterCompat.loadAnimator(context, R.animator.delete_mic_animation);
@@ -197,7 +208,9 @@ public class AnimationHelper {
             }
         });
 
-        recordBtn.stopScale();
+        if (recordButtonGrowingAnimationEnabled) {
+            recordBtn.stopScale();
+        }
         positionAnimator.setDuration(0);
         positionAnimator.start();
 

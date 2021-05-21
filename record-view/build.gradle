@@ -1,25 +1,14 @@
 apply plugin: 'com.android.library'
-//apply plugin: 'com.novoda.bintray-release'
+apply plugin: 'maven-publish'
 
-/*
-publish {
-    userOrg = 'devlomi'
-    groupId = 'com.devlomi.record-view'
-    artifactId = 'record-view'
-    uploadName = 'RecordView'
-    publishVersion = '2.0.1'
-    desc = 'A Simple Audio Recorder View with hold to Record Button and Swipe to Cancel'
-    dryRun = false
-    website = 'https://github.com/3llomi/RecordView'
-}
-*/
 android {
-    compileSdkVersion 27
-    buildToolsVersion "27.0.3"
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
+
 
     defaultConfig {
-        minSdkVersion 14
-        targetSdkVersion 27
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
         vectorDrawables.useSupportLibrary = true
     }
 
@@ -33,7 +22,23 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'io.supercharge:shimmerlayout:2.1.0'
     testImplementation 'junit:junit:4.12'
 }
+
+//afterEvaluate {
+//    publishing {
+//        publications {
+//            // Creates a Maven publication called "release".
+//            release(MavenPublication) {
+//                // Applies the component for the release build variant.
+//                from components.release
+//                // You can then customize attributes of the publication as shown below.
+//                groupId = 'com.devlomi.record-view'
+//                artifactId = 'record-view'
+//                version = '3.0.0'
+//            }
+//        }
+//    }
+//}

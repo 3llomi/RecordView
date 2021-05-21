@@ -5,9 +5,8 @@ import android.content.res.AssetFileDescriptor;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
+import android.os.Handler;
 import android.os.SystemClock;
-import android.support.annotation.Nullable;
-import android.support.v7.content.res.AppCompatResources;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -16,6 +15,9 @@ import android.widget.Chronometer;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.content.res.AppCompatResources;
 
 import java.io.IOException;
 
@@ -38,6 +40,7 @@ public class RecordView extends RelativeLayout {
     private long startTime, elapsedTime = 0;
     private Context context;
     private OnRecordListener recordListener;
+    private RecordPermissionHandler recordPermissionHandler;
     private boolean isSwiped, isLessThanSecondAllowed = false;
     private boolean isSoundEnabled = true;
     private int RECORD_START = R.raw.record_start;
@@ -45,7 +48,14 @@ public class RecordView extends RelativeLayout {
     private int RECORD_ERROR = R.raw.record_error;
     private MediaPlayer player;
     private AnimationHelper animationHelper;
+    private boolean isRecordButtonGrowingAnimationEnabled = true;
+    private boolean shimmerEffectEnabled = true;
+    private long timeLimit = -1;
+    private Runnable runnable;
+    private Handler handler;
+    private RecordButton recordButton;
 
+    private boolean canRecord = true;
 
     public RecordView(Context context) {
         super(context);
@@ -119,15 +129,47 @@ public class RecordView extends RelativeLayout {
                 setSlideToCancelArrowColor(arrowColor);
 
 
-
             setMarginRight(slideMarginRight, true);
 
             typedArray.recycle();
         }
 
 
-        animationHelper = new AnimationHelper(context, basketImg, smallBlinkingMic);
+        animationHelper = new AnimationHelper(context, basketImg, smallBlinkingMic, isRecordButtonGrowingAnimationEnabled);
 
+
+    }
+
+    private boolean isTimeLimitValid() {
+        return timeLimit > 0;
+    }
+
+    private void initTimeLimitHandler() {
+        handler = new Handler();
+        runnable = new Runnable() {
+            @Override
+            public void run() {
+
+                if (recordListener != null && !isSwiped)
+                    recordListener.onFinish(elapsedTime, true);
+
+                removeTimeLimitCallbacks();
+
+                animationHelper.setStartRecorded(false);
+
+
+                if (!isSwiped)
+                    playSound(RECORD_FINISHED);
+
+
+                if (recordButton != null) {
+                    resetRecord(recordButton);
+                }
+                isSwiped = true;
+
+            }
+
+        };
     }
 
 
@@ -184,17 +226,32 @@ public class RecordView extends RelativeLayout {
 
     protected void onActionDown(RecordButton recordBtn, MotionEvent motionEvent) {
 
+        if (!isRecordPermissionGranted()) {
+            return;
+        }
+
+        this.recordButton = recordBtn;
+
         if (recordListener != null)
             recordListener.onStart();
 
+        if (isTimeLimitValid()) {
+            removeTimeLimitCallbacks();
+            handler.postDelayed(runnable, timeLimit);
+        }
 
         animationHelper.setStartRecorded(true);
         animationHelper.resetBasketAnimation();
         animationHelper.resetSmallMic();
 
 
-        recordBtn.startScale();
-        slideToCancelLayout.startShimmerAnimation();
+        if (isRecordButtonGrowingAnimationEnabled) {
+            recordBtn.startScale();
+        }
+
+        if (shimmerEffectEnabled) {
+            slideToCancelLayout.startShimmerAnimation();
+        }
 
         initialX = recordBtn.getX();
 
@@ -215,6 +272,9 @@ public class RecordView extends RelativeLayout {
 
     protected void onActionMove(RecordButton recordBtn, MotionEvent motionEvent) {
 
+        if (!canRecord) {
+            return;
+        }
 
         long time = System.currentTimeMillis() - startTime;
 
@@ -239,7 +299,10 @@ public class RecordView extends RelativeLayout {
                 animationHelper.moveRecordButtonAndSlideToCancelBack(recordBtn, slideToCancelLayout, initialX, difX);
 
                 counterTime.stop();
-                slideToCancelLayout.stopShimmerAnimation();
+                if (shimmerEffectEnabled) {
+                    slideToCancelLayout.stopShimmerAnimation();
+                }
+
                 isSwiped = true;
 
 
@@ -247,6 +310,10 @@ public class RecordView extends RelativeLayout {
 
                 if (recordListener != null)
                     recordListener.onCancel();
+
+                if (isTimeLimitValid()) {
+                    removeTimeLimitCallbacks();
+                }
 
 
             } else {
@@ -280,12 +347,17 @@ public class RecordView extends RelativeLayout {
 
     protected void onActionUp(RecordButton recordBtn) {
 
+        if (!canRecord) {
+            return;
+        }
+
         elapsedTime = System.currentTimeMillis() - startTime;
 
         if (!isLessThanSecondAllowed && isLessThanOneSecond(elapsedTime) && !isSwiped) {
             if (recordListener != null)
                 recordListener.onLessThanSecond();
 
+            removeTimeLimitCallbacks();
             animationHelper.setStartRecorded(false);
 
             playSound(RECORD_ERROR);
@@ -293,7 +365,9 @@ public class RecordView extends RelativeLayout {
 
         } else {
             if (recordListener != null && !isSwiped)
-                recordListener.onFinish(elapsedTime);
+                recordListener.onFinish(elapsedTime, false);
+
+            removeTimeLimitCallbacks();
 
             animationHelper.setStartRecorded(false);
 
@@ -303,7 +377,12 @@ public class RecordView extends RelativeLayout {
 
         }
 
+        resetRecord(recordBtn);
 
+
+    }
+
+    private void resetRecord(RecordButton recordBtn) {
         //if user has swiped then do not hide SmallMic since it will be hidden after swipe Animation
         hideViews(!isSwiped);
 
@@ -313,11 +392,28 @@ public class RecordView extends RelativeLayout {
 
         animationHelper.moveRecordButtonAndSlideToCancelBack(recordBtn, slideToCancelLayout, initialX, difX);
         counterTime.stop();
-        slideToCancelLayout.stopShimmerAnimation();
-
-
+        if (shimmerEffectEnabled) {
+            slideToCancelLayout.stopShimmerAnimation();
+        }
     }
 
+    private void removeTimeLimitCallbacks() {
+        if (isTimeLimitValid()) {
+            handler.removeCallbacks(runnable);
+        }
+    }
+
+
+    private boolean isRecordPermissionGranted() {
+
+        if (recordPermissionHandler == null) {
+            canRecord = true;
+        }
+
+        canRecord = recordPermissionHandler.isPermissionGranted();
+
+        return canRecord;
+    }
 
     private void setMarginRight(int marginRight, boolean convertToDp) {
         RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) slideToCancelLayout.getLayoutParams();
@@ -332,6 +428,10 @@ public class RecordView extends RelativeLayout {
 
     public void setOnRecordListener(OnRecordListener recrodListener) {
         this.recordListener = recrodListener;
+    }
+
+    public void setRecordPermissionHandler(RecordPermissionHandler recordPermissionHandler) {
+        this.recordPermissionHandler = recordPermissionHandler;
     }
 
     public void setOnBasketAnimationEndListener(OnBasketAnimationEnd onBasketAnimationEndListener) {
@@ -386,8 +486,8 @@ public class RecordView extends RelativeLayout {
     public void setCounterTimeColor(int color) {
         counterTime.setTextColor(color);
     }
-    
-    public void setSlideToCancelArrowColor(int color){
+
+    public void setSlideToCancelArrowColor(int color) {
         arrow.setColorFilter(color);
     }
 
@@ -396,6 +496,41 @@ public class RecordView extends RelativeLayout {
         float bounds = convertDpToPixel ? DpUtil.toPixel(cancelBounds, context) : cancelBounds;
         this.cancelBounds = bounds;
     }
+
+    public boolean isRecordButtonGrowingAnimationEnabled() {
+        return isRecordButtonGrowingAnimationEnabled;
+    }
+
+    public void setRecordButtonGrowingAnimationEnabled(boolean recordButtonGrowingAnimationEnabled) {
+        isRecordButtonGrowingAnimationEnabled = recordButtonGrowingAnimationEnabled;
+        animationHelper.setRecordButtonGrowingAnimationEnabled(recordButtonGrowingAnimationEnabled);
+    }
+
+    public boolean isShimmerEffectEnabled() {
+        return shimmerEffectEnabled;
+    }
+
+    public void setShimmerEffectEnabled(boolean shimmerEffectEnabled) {
+        this.shimmerEffectEnabled = shimmerEffectEnabled;
+    }
+
+    public long getTimeLimit() {
+        return timeLimit;
+    }
+
+    public void setTimeLimit(long timeLimit) {
+        this.timeLimit = timeLimit;
+
+        if (handler != null && runnable != null) {
+            removeTimeLimitCallbacks();
+        }
+        initTimeLimitHandler();
+    }
+
+    public void setTrashIconColor(int color) {
+        animationHelper.setTrashIconColor(color);
+    }
+
 
 }
 

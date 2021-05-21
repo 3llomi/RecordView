@@ -19,8 +19,14 @@ A Simple Audio Recorder View with hold to Record Button and Swipe to Cancel
 ## Install
 ```gradle
 dependencies {
+   //for AppCompat use:
+    //appcompat v26+ is higly recommended to support older APIs
   implementation 'com.devlomi.record-view:record-view:2.0.1'
-  //appcompat v26+ is higly recommended to support older APIs
+  
+
+   //for AndroidX use:
+  implementation 'com.devlomi.record-view:record-view:3.0.0'
+
 }
 ```
 
@@ -100,8 +106,9 @@ recordView.setOnRecordListener(new OnRecordListener() {
             }
 
             @Override
-            public void onFinish(long recordTime) {
+            public void onFinish(long recordTime, boolean limitReached) {
                 //Stop Recording..
+                //limitReached to determine if the Record was finished when time limit reached.
                 String time = getHumanTimeText(recordTime);
                 Log.d("RecordView", "onFinish");
 
@@ -176,6 +183,18 @@ recordView.setCancelBounds(8);//dp
         recordView.setSlideToCancelArrowColor(Color.parseColor("#ff0000"));
         //change Counter Time (Chronometer) color
         recordView.setCounterTimeColor(Color.parseColor("#ff0000"));
+
+        //enable or disable ShimmerEffect
+        recordView.setShimmerEffectEnabled(true);
+
+        //auto cancelling recording after timeLimit (In millis)  
+        recordView.setTimeLimit(30000);//30 sec
+
+        //set Trash Icon Color (when slide to cancel is triggered)
+        recordView.setTrashIconColor(Color.parseColor("#fff000"));
+        
+        // enable or disable the Growing animation for record Button.
+        recordView.setRecordButtonGrowingAnimationEnabled(true);
 
 ```
 

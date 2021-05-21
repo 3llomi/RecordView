@@ -1,28 +1,43 @@
 package com.devlomi.recordview;
 
+import android.Manifest;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
 import com.devlomi.record_view.OnBasketAnimationEnd;
 import com.devlomi.record_view.OnRecordClickListener;
 import com.devlomi.record_view.OnRecordListener;
 import com.devlomi.record_view.RecordButton;
+import com.devlomi.record_view.RecordPermissionHandler;
 import com.devlomi.record_view.RecordView;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+
+import static androidx.core.content.PermissionChecker.PERMISSION_GRANTED;
 
 public class MainActivity extends AppCompatActivity {
 
+    private AudioRecorder audioRecorder;
+    private File recordFile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        audioRecorder = new AudioRecorder();
 
         RecordView recordView = (RecordView) findViewById(R.id.record_view);
         final RecordButton recordButton = (RecordButton) findViewById(R.id.record_button);
@@ -77,6 +92,12 @@ public class MainActivity extends AppCompatActivity {
         recordView.setOnRecordListener(new OnRecordListener() {
             @Override
             public void onStart() {
+                recordFile = new File(getFilesDir(), UUID.randomUUID().toString() + ".3gp");
+                try {
+                    audioRecorder.start(recordFile.getPath());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 Log.d("RecordView", "onStart");
                 Toast.makeText(MainActivity.this, "OnStartRecord", Toast.LENGTH_SHORT).show();
 
@@ -84,6 +105,8 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onCancel() {
+                stopRecording(true);
+
                 Toast.makeText(MainActivity.this, "onCancel", Toast.LENGTH_SHORT).show();
 
                 Log.d("RecordView", "onCancel");
@@ -91,17 +114,20 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFinish(long recordTime) {
+            public void onFinish(long recordTime, boolean limitReached) {
+                stopRecording(false);
+
 
                 String time = getHumanTimeText(recordTime);
-                Toast.makeText(MainActivity.this, "onFinishRecord - Recorded Time is: " + time, Toast.LENGTH_SHORT).show();
-                Log.d("RecordView", "onFinish");
-
+                Toast.makeText(MainActivity.this, "onFinishRecord - Recorded Time is: " + time + " File saved at " + recordFile.getPath(), Toast.LENGTH_SHORT).show();
+                Log.d("RecordView", "onFinish" + " Limit Reached? " + limitReached);
                 Log.d("RecordTime", time);
             }
 
             @Override
             public void onLessThanSecond() {
+                stopRecording(true);
+
                 Toast.makeText(MainActivity.this, "OnLessThanSecond", Toast.LENGTH_SHORT).show();
                 Log.d("RecordView", "onLessThanSecond");
             }
@@ -115,7 +141,37 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        recordView.setRecordPermissionHandler(new RecordPermissionHandler() {
+            @Override
+            public boolean isPermissionGranted() {
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                    return true;
+                }
 
+                boolean recordPermissionAvailable = ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.RECORD_AUDIO) == PERMISSION_GRANTED;
+                if (recordPermissionAvailable) {
+                    return true;
+                }
+
+
+                ActivityCompat.
+                        requestPermissions(MainActivity.this,
+                                new String[]{Manifest.permission.RECORD_AUDIO},
+                                0);
+
+                return false;
+
+            }
+        });
+
+
+    }
+
+    private void stopRecording(boolean deleteFile) {
+        audioRecorder.stop();
+        if (recordFile != null && deleteFile) {
+            recordFile.delete();
+        }
     }
 
 
