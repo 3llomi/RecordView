@@ -17,6 +17,17 @@ A Simple Audio Recorder View with hold to Record Button and Swipe to Cancel
 
 
 ## Install
+Add this to your project build.gradle
+```gradle
+allprojects {
+    repositories {
+        maven { url 'https://jitpack.io' }
+    }
+}
+```
+
+Add this to your module build.gradle
+
 ```gradle
 dependencies {
    //for AppCompat use:
@@ -25,7 +36,7 @@ dependencies {
   
 
    //for AndroidX use:
-  implementation 'com.devlomi.record-view:record-view:3.0.0'
+  implementation 'com.devlomi.record-view:record-view:3.0.1'
 
 }
 ```
@@ -159,6 +170,33 @@ default is 8dp
 ```java
 recordView.setCancelBounds(8);//dp
 ```
+
+Handling Permissions(Optional)
+```java
+    recordView.setRecordPermissionHandler(new RecordPermissionHandler() {
+            @Override
+            public boolean isPermissionGranted() {
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                    return true;
+                }
+
+                boolean recordPermissionAvailable = ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.RECORD_AUDIO) == PERMISSION_GRANTED;
+                if (recordPermissionAvailable) {
+                    return true;
+                }
+
+
+                ActivityCompat.
+                        requestPermissions(MainActivity.this,
+                                new String[]{Manifest.permission.RECORD_AUDIO},
+                                0);
+
+                return false;
+
+            }
+        });
+```
+
 
 ### Some Customization
 
