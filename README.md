@@ -30,13 +30,14 @@ Add this to your module build.gradle
 
 ```gradle
 dependencies {
-   //for AppCompat use:
+    //for AppCompat use:
     //appcompat v26+ is higly recommended to support older APIs
-  implementation 'com.devlomi.record-view:record-view:2.0.1'
+    implementation 'com.devlomi.record-view:record-view:2.0.1'
   
 
-   //for AndroidX use:
-  implementation 'com.devlomi.record-view:record-view:3.0.1'
+    //for AndroidX use:
+    implementation 'com.github.3llomi:RecordView:3.0.1'
+
 
 }
 ```
@@ -91,11 +92,11 @@ dependencies {
 
 ```java
 
-        RecordView recordView = (RecordView) findViewById(R.id.record_view);
-        RecordButton recordButton = (RecordButton) findViewById(R.id.record_button);
+RecordView recordView = (RecordView) findViewById(R.id.record_view);
+RecordButton recordButton = (RecordButton) findViewById(R.id.record_button);
 
-        //IMPORTANT
-        recordButton.setRecordView(recordView);
+//IMPORTANT
+recordButton.setRecordView(recordView);
 
 ```
 
@@ -138,10 +139,10 @@ recordView.setOnRecordListener(new OnRecordListener() {
 ### Handle Clicks for Record Button
 ```java
 
-    recordButton.setListenForRecord(false);
+recordButton.setListenForRecord(false);
 
  //ListenForRecord must be false ,otherwise onClick will not be called
-        recordButton.setOnRecordClickListener(new OnRecordClickListener() {
+recordButton.setOnRecordClickListener(new OnRecordClickListener() {
             @Override
             public void onClick(View v) {
                 Toast.makeText(MainActivity.this, "RECORD BUTTON CLICKED", Toast.LENGTH_SHORT).show();
@@ -154,7 +155,7 @@ recordView.setOnRecordListener(new OnRecordListener() {
 
 ```java
 
-   recordView.setOnBasketAnimationEndListener(new OnBasketAnimationEnd() {
+recordView.setOnBasketAnimationEndListener(new OnBasketAnimationEnd() {
             @Override
             public void onAnimationEnd() {
                 Log.d("RecordView", "Basket Animation Finished");
@@ -173,7 +174,7 @@ recordView.setCancelBounds(8);//dp
 
 Handling Permissions(Optional)
 ```java
-    recordView.setRecordPermissionHandler(new RecordPermissionHandler() {
+recordView.setRecordPermissionHandler(new RecordPermissionHandler() {
             @Override
             public boolean isPermissionGranted() {
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
@@ -201,38 +202,38 @@ Handling Permissions(Optional)
 ### Some Customization
 
 ```java
-        recordView.setSmallMicColor(Color.parseColor("#c2185b"));
+recordView.setSmallMicColor(Color.parseColor("#c2185b"));
 
-        recordView.setSlideToCancelText("TEXT");
+recordView.setSlideToCancelText("TEXT");
 
-        //disable Sounds
-        recordView.setSoundEnabled(false);
+//disable Sounds
+recordView.setSoundEnabled(false);
 
-        //prevent recording under one Second (it's false by default)
-        recordView.setLessThanSecondAllowed(false);
-    
-        //set Custom sounds onRecord 
-        //you can pass 0 if you don't want to play sound in certain state
-        recordView.setCustomSounds(R.raw.record_start,R.raw.record_finished,0);
-        
-        //change slide To Cancel Text Color
-        recordView.setSlideToCancelTextColor(Color.parseColor("#ff0000"));
-        //change slide To Cancel Arrow Color
-        recordView.setSlideToCancelArrowColor(Color.parseColor("#ff0000"));
-        //change Counter Time (Chronometer) color
-        recordView.setCounterTimeColor(Color.parseColor("#ff0000"));
+//prevent recording under one Second (it's false by default)
+recordView.setLessThanSecondAllowed(false);
 
-        //enable or disable ShimmerEffect
-        recordView.setShimmerEffectEnabled(true);
+//set Custom sounds onRecord 
+//you can pass 0 if you don't want to play sound in certain state
+recordView.setCustomSounds(R.raw.record_start,R.raw.record_finished,0);
 
-        //auto cancelling recording after timeLimit (In millis)  
-        recordView.setTimeLimit(30000);//30 sec
+//change slide To Cancel Text Color
+recordView.setSlideToCancelTextColor(Color.parseColor("#ff0000"));
+//change slide To Cancel Arrow Color
+recordView.setSlideToCancelArrowColor(Color.parseColor("#ff0000"));
+//change Counter Time (Chronometer) color
+recordView.setCounterTimeColor(Color.parseColor("#ff0000"));
 
-        //set Trash Icon Color (when slide to cancel is triggered)
-        recordView.setTrashIconColor(Color.parseColor("#fff000"));
-        
-        // enable or disable the Growing animation for record Button.
-        recordView.setRecordButtonGrowingAnimationEnabled(true);
+//enable or disable ShimmerEffect
+recordView.setShimmerEffectEnabled(true);
+
+//auto cancelling recording after timeLimit (In millis)  
+recordView.setTimeLimit(30000);//30 sec
+
+//set Trash Icon Color (when slide to cancel is triggered)
+recordView.setTrashIconColor(Color.parseColor("#fff000"));
+
+// enable or disable the Growing animation for record Button.
+recordView.setRecordButtonGrowingAnimationEnabled(true);
 
 ```
 
