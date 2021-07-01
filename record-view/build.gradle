@@ -37,7 +37,7 @@ afterEvaluate {
                 // You can then customize attributes of the publication as shown below.
                 groupId = 'com.devlomi.record-view'
                 artifactId = 'record-view'
-                version = '3.0.1'
+                version = '3.0.2'
             }
         }
     }
