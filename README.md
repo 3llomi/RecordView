@@ -164,6 +164,11 @@ recordView.setOnBasketAnimationEndListener(new OnBasketAnimationEnd() {
 
 ```
 
+### Enable Record Lock Feature
+```java
+recordView.setLockEnabled(true);
+recordView.setRecordLockImageView(findViewById(R.id.record_lock));
+```
 
 Change Swipe To Cancel Bounds (when the 'Slide To Cancel' Text View get before Counter).
 default is 8dp
@@ -234,6 +239,14 @@ recordView.setTrashIconColor(Color.parseColor("#fff000"));
 
 // enable or disable the Growing animation for record Button.
 recordView.setRecordButtonGrowingAnimationEnabled(true);
+
+//Lock Customization
+recordLockView.setDefaultCircleColor(Color.parseColor("#0A81AB"));
+recordLockView.setCircleLockedColor(Color.parseColor("#314E52"));
+recordLockView.setLockColor(Color.WHITE);
+
+recordButton.setSendIconResource(R.drawable.recv_ic_send)
+
 
 ```
 

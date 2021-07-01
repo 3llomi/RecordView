@@ -39,11 +39,12 @@ public class MainActivity extends AppCompatActivity {
 
         audioRecorder = new AudioRecorder();
 
-        RecordView recordView = (RecordView) findViewById(R.id.record_view);
-        final RecordButton recordButton = (RecordButton) findViewById(R.id.record_button);
-        Button btnChangeOnclick = (Button) findViewById(R.id.btn_change_onclick);
+        RecordView recordView = findViewById(R.id.record_view);
+        final RecordButton recordButton = findViewById(R.id.record_button);
+        Button btnChangeOnclick = findViewById(R.id.btn_change_onclick);
 
         //IMPORTANT
+        recordView.setRecordLockImageView(findViewById(R.id.record_lock));
         recordButton.setRecordView(recordView);
 
         // if you want to click the button (in case if you want to make the record button a Send Button for example..)

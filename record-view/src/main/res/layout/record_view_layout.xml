@@ -7,8 +7,8 @@
     android:layout_height="wrap_content"
     android:clipChildren="false"
     android:clipToPadding="false"
-    android:paddingBottom="15dp"
     android:paddingTop="15dp"
+    android:paddingBottom="15dp"
     android:visibility="visible">
 
 
@@ -41,6 +41,14 @@
 
         </LinearLayout>
     </io.supercharge.shimmerlayout.ShimmerLayout>
+
+    <TextView
+        android:id="@+id/recv_tv_cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:text="CANCEL"
+        android:textColor="#ff0000" />
 
     <ImageView
         android:id="@+id/glowing_mic"
