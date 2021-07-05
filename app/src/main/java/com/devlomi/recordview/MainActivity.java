@@ -43,8 +43,10 @@ public class MainActivity extends AppCompatActivity {
         final RecordButton recordButton = findViewById(R.id.record_button);
         Button btnChangeOnclick = findViewById(R.id.btn_change_onclick);
 
+        // To Enable Record Lock
+//        recordView.setLockEnabled(true);
+//        recordView.setRecordLockImageView(findViewById(R.id.record_lock));
         //IMPORTANT
-        recordView.setRecordLockImageView(findViewById(R.id.record_lock));
         recordButton.setRecordView(recordView);
 
         // if you want to click the button (in case if you want to make the record button a Send Button for example..)

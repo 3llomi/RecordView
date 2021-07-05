@@ -194,7 +194,7 @@ public class AnimationHelper {
         smallBlinkingMic.startAnimation(alphaAnimation);
     }
 
-    public void moveRecordButtonAndSlideToCancelBack(final RecordButton recordBtn, FrameLayout slideToCancelLayout, float initialX, float initialY, float difX) {
+    public void moveRecordButtonAndSlideToCancelBack(final RecordButton recordBtn, FrameLayout slideToCancelLayout, float initialX, float initialY, float difX, boolean setY) {
 
         final ValueAnimator positionAnimator =
                 ValueAnimator.ofFloat(recordBtn.getX(), initialX);
@@ -205,7 +205,9 @@ public class AnimationHelper {
             public void onAnimationUpdate(ValueAnimator animation) {
                 float x = (Float) animation.getAnimatedValue();
                 recordBtn.setX(x);
-                recordBtn.setY(initialY);
+                if (setY) {
+                    recordBtn.setY(initialY);
+                }
             }
         });
 

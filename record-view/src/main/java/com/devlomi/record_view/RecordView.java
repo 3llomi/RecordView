@@ -1,5 +1,6 @@
 package com.devlomi.record_view;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.TypedArray;
@@ -8,6 +9,7 @@ import android.media.MediaPlayer;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,7 +37,7 @@ public class RecordView extends RelativeLayout implements RecordLockViewListener
     private TextView slideToCancel, cancelTextView;
     private ShimmerLayout slideToCancelLayout;
     private ImageView arrow;
-    private float initialX, initialY, basketInitialY, difX = 0;
+    private float initialRecordButtonX, initialRecordButtonY, recordButtonYInWindow, basketInitialY, difX = 0;
     private float cancelBounds = DEFAULT_CANCEL_BOUNDS;
     private long startTime, elapsedTime = 0;
     private Context context;
@@ -59,10 +61,11 @@ public class RecordView extends RelativeLayout implements RecordLockViewListener
 
     private RecordLockView recordLockView;
     private boolean isLockEnabled = false;
-    float recordLockY = 0f;
-    float recordLockX = 0f;
+    float recordLockYInWindow = 0f;
+    float recordLockXInWindow = 0f;
     private boolean fractionReached = false;
-    private float fiveDp = 0;
+    private float currentYFraction = 0f;
+    int screenHeight = 0;
 
 
     public RecordView(Context context) {
@@ -155,8 +158,6 @@ public class RecordView extends RelativeLayout implements RecordLockViewListener
 
             typedArray.recycle();
         }
-
-        fiveDp = DpUtil.toPixel(5, context);
 
 
         animationHelper = new AnimationHelper(context, basketImg, smallBlinkingMic, isRecordButtonGrowingAnimationEnabled);
@@ -303,10 +304,22 @@ public class RecordView extends RelativeLayout implements RecordLockViewListener
             slideToCancelLayout.startShimmerAnimation();
         }
 
-        initialX = recordBtn.getX();
-        initialY = recordBtn.getY();
-        recordLockY = recordLockView.getY();
-        recordLockX = recordLockView.getX();
+        initialRecordButtonX = recordBtn.getX();
+
+
+        int[] recordButtonLocation = new int[2];
+        recordBtn.getLocationInWindow(recordButtonLocation);
+
+        initialRecordButtonY = recordButton.getY();
+        recordButtonYInWindow = recordButtonLocation[1] + recordButton.getHeight();
+
+        if (isLockEnabled && recordLockView != null) {
+            int[] recordLockLocation = new int[2];
+            recordLockView.getLocationInWindow(recordLockLocation);
+            recordLockXInWindow = recordLockLocation[0];
+            recordLockYInWindow = recordLockLocation[1] + recordLockView.getHeight();
+        }
+
 
         basketInitialY = basketImg.getY() + 90;
 
@@ -319,11 +332,12 @@ public class RecordView extends RelativeLayout implements RecordLockViewListener
         startTime = System.currentTimeMillis();
         counterTime.start();
         isSwiped = false;
+        currentYFraction = 0f;
 
     }
 
 
-    protected void onActionMove(RecordButton recordBtn, MotionEvent motionEvent) {
+    protected void onActionMove(final RecordButton recordBtn, MotionEvent motionEvent) {
 
         if (!canRecord || fractionReached) {
             return;
@@ -349,7 +363,7 @@ public class RecordView extends RelativeLayout implements RecordLockViewListener
                     animationHelper.animateBasket(basketInitialY);
                 }
 
-                animationHelper.moveRecordButtonAndSlideToCancelBack(recordBtn, slideToCancelLayout, initialX, initialY, difX);
+                animationHelper.moveRecordButtonAndSlideToCancelBack(recordBtn, slideToCancelLayout, initialRecordButtonX, initialRecordButtonY, difX, isLockEnabled);
 
                 counterTime.stop();
                 if (shimmerEffectEnabled) {
@@ -380,7 +394,7 @@ public class RecordView extends RelativeLayout implements RecordLockViewListener
 
 
                     if (difX == 0)
-                        difX = (initialX - slideToCancelLayout.getX());
+                        difX = (initialRecordButtonX - slideToCancelLayout.getX());
 
 
                     slideToCancelLayout.animate()
@@ -391,17 +405,29 @@ public class RecordView extends RelativeLayout implements RecordLockViewListener
 
                 }
 
-                if (canMoveY(motionEvent)) {
+                  /*
+                  if RecordLock was NOT inside the same parent as RecordButton
+                   animate.y() OR view.setY() will setY value INSIDE its parent
+                   we need a way to convert the inner value to outer value
+                   since motionEvent.getRawY() returns Y's location onScreen
+                   we had to get screen height and get the difference between motionEvent and screen height
+                 */
+                float newY = motionEvent.getRawY() - screenHeight;
+
+                if (canMoveY(motionEvent, newY)) {
+
                     recordBtn.animate()
-                            .y(motionEvent.getRawY())
+                            .y(newY)
                             .setDuration(0)
                             .start();
 
                     float currentY = motionEvent.getRawY();
-                    float minY = initialY;
-                    float maxY = recordLockY;
+                    float minY = recordLockYInWindow;
+                    float maxY = recordButtonYInWindow;
 
                     float fraction = (currentY - minY) / (maxY - minY);
+                    fraction = 1 - fraction;
+                    currentYFraction = fraction;
 
                     recordLockView.animateLock(fraction);
 
@@ -420,10 +446,10 @@ public class RecordView extends RelativeLayout implements RecordLockViewListener
 
     private boolean canMoveX(MotionEvent motionEvent) {
         //Prevent Swiping out of bounds
-        if (motionEvent.getRawX() < initialX) {
+        if (motionEvent.getRawX() < initialRecordButtonX) {
             if (isLockEnabled) {
                 //prevent swiping X if record button goes up
-                return recordButton.getY() >= initialY - fiveDp;
+                return currentYFraction <= 0.3;
             }
             return true;
         }
@@ -431,17 +457,15 @@ public class RecordView extends RelativeLayout implements RecordLockViewListener
         return false;
     }
 
-    private boolean canMoveY(MotionEvent motionEvent) {
+    private boolean canMoveY(MotionEvent motionEvent, float dif) {
 
         if (isLockEnabled) {
             /*
              1. prevent swiping below record button
-             2. prevent swiping up if x <0
-             3. prevent swiping up if record button is NOT near record Lock's X
+             2. prevent swiping up if record button is NOT near record Lock's X
              */
-            return motionEvent.getRawY() - fiveDp <= initialY
-                    && motionEvent.getRawX() > 0
-                    && motionEvent.getRawX() + 75 >= recordLockX;
+            return dif <= initialRecordButtonY
+                    && motionEvent.getRawX() >= recordLockXInWindow;
         }
 
         return false;
@@ -493,8 +517,8 @@ public class RecordView extends RelativeLayout implements RecordLockViewListener
         slideToCancelLayout.setVisibility(GONE);
 
         recordButton.animate()
-                .x(initialX)
-                .y(initialY)
+                .x(initialRecordButtonX)
+                .y(initialRecordButtonY)
                 .setDuration(100)
                 .start();
 
@@ -516,14 +540,17 @@ public class RecordView extends RelativeLayout implements RecordLockViewListener
         if (!isSwiped)
             animationHelper.clearAlphaAnimation(true);
 
-        animationHelper.moveRecordButtonAndSlideToCancelBack(recordBtn, slideToCancelLayout, initialX, initialY, difX);
+        animationHelper.moveRecordButtonAndSlideToCancelBack(recordBtn, slideToCancelLayout, initialRecordButtonX, initialRecordButtonY, difX, isLockEnabled);
         counterTime.stop();
         if (shimmerEffectEnabled) {
             slideToCancelLayout.stopShimmerAnimation();
         }
 
-        recordLockView.reset();
-        recordBtn.changeIconToRecord();
+        if (isLockEnabled) {
+            recordLockView.reset();
+            recordBtn.changeIconToRecord();
+        }
+
         cancelTextView.setVisibility(GONE);
         recordBtn.setListenForRecord(true);
         recordBtn.setInLockMode(false);
@@ -540,6 +567,7 @@ public class RecordView extends RelativeLayout implements RecordLockViewListener
 
         if (recordPermissionHandler == null) {
             canRecord = true;
+            return true;
         }
 
         canRecord = recordPermissionHandler.isPermissionGranted();
@@ -681,6 +709,20 @@ public class RecordView extends RelativeLayout implements RecordLockViewListener
 
     public void setLockEnabled(boolean lockEnabled) {
         isLockEnabled = lockEnabled;
+        if (isLockEnabled) {
+
+            DisplayMetrics displayMetrics = new DisplayMetrics();
+            //TODO TEST IN FRAGMENT
+            if (getContext() instanceof Activity) {
+                Activity context = (Activity) getContext();
+                context.getWindowManager()
+                        .getDefaultDisplay()
+                        .getMetrics(displayMetrics);
+
+                screenHeight = displayMetrics.heightPixels;
+            }
+
+        }
     }
 
     protected void setRecordButton(RecordButton recordButton) {

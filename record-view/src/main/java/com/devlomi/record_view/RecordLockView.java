@@ -118,7 +118,7 @@ public class RecordLockView extends View {
      */
     protected void animateLock(float fraction) {
 
-        float topLockFraction = (float) (fraction + 0.37);
+        float topLockFraction = (float) (fraction + 0.25);
 
         //resize topLock
         int topLockDrawableHeight = (int) (topLockDrawable.getIntrinsicHeight() / 2.0);
@@ -137,7 +137,7 @@ public class RecordLockView extends View {
         float newBottom = differenceBottom + (startBottom * topLockFraction);
 
 
-        if (fraction >= 0.75) {
+        if (fraction >= 0.85) {
             recordLockViewListener.onFractionReached();
             animateAlpha();
             circleColor = circleLockedColor;
