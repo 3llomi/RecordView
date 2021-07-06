@@ -210,6 +210,7 @@ public class RecordView extends RelativeLayout {
 
 
     protected void onActionMove(RecordButton recordBtn, MotionEvent motionEvent) {
+        getParent().requestDisallowInterceptTouchEvent(true);
         long time = System.currentTimeMillis() - startTime;
 
         if (!isSwiped) {
@@ -259,7 +260,7 @@ public class RecordView extends RelativeLayout {
     }
 
     protected void onActionUp(RecordButton recordBtn) {
-
+        getParent().requestDisallowInterceptTouchEvent(false);
         elapsedTime = System.currentTimeMillis() - startTime;
 
         if (!isLessThanSecondAllowed && isLessThanOneSecond(elapsedTime) && !isSwiped) {
