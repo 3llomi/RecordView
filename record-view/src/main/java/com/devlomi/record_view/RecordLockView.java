@@ -117,6 +117,9 @@ public class RecordLockView extends View {
     we will move its top and bottom so it goes inside the bottom lock 'R.drawable.recv_lock_bottom'
      */
     protected void animateLock(float fraction) {
+        if (bottomLockRect == null) {
+            return;
+        }
 
         float topLockFraction = (float) (fraction + 0.25);
 

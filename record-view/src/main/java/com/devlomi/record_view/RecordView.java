@@ -1,6 +1,5 @@
 package com.devlomi.record_view;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.TypedArray;
@@ -9,7 +8,6 @@ import android.media.MediaPlayer;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -65,7 +63,6 @@ public class RecordView extends RelativeLayout implements RecordLockViewListener
     float recordLockXInWindow = 0f;
     private boolean fractionReached = false;
     private float currentYFraction = 0f;
-    int screenHeight = 0;
 
 
     public RecordView(Context context) {
@@ -412,8 +409,7 @@ public class RecordView extends RelativeLayout implements RecordLockViewListener
                    since motionEvent.getRawY() returns Y's location onScreen
                    we had to get screen height and get the difference between motionEvent and screen height
                  */
-                float newY = motionEvent.getRawY() - screenHeight;
-
+                float newY = motionEvent.getRawY() - recordButtonYInWindow;
                 if (canMoveY(motionEvent, newY)) {
 
                     recordBtn.animate()
@@ -709,20 +705,6 @@ public class RecordView extends RelativeLayout implements RecordLockViewListener
 
     public void setLockEnabled(boolean lockEnabled) {
         isLockEnabled = lockEnabled;
-        if (isLockEnabled) {
-
-            DisplayMetrics displayMetrics = new DisplayMetrics();
-            //TODO TEST IN FRAGMENT
-            if (getContext() instanceof Activity) {
-                Activity context = (Activity) getContext();
-                context.getWindowManager()
-                        .getDefaultDisplay()
-                        .getMetrics(displayMetrics);
-
-                screenHeight = displayMetrics.heightPixels;
-            }
-
-        }
     }
 
     protected void setRecordButton(RecordButton recordButton) {

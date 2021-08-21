@@ -1,5 +1,7 @@
 package com.devlomi.recordview;
 
+import static androidx.core.content.PermissionChecker.PERMISSION_GRANTED;
+
 import android.Manifest;
 import android.graphics.Color;
 import android.os.Build;
@@ -24,8 +26,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-
-import static androidx.core.content.PermissionChecker.PERMISSION_GRANTED;
 
 public class MainActivity extends AppCompatActivity {
 
