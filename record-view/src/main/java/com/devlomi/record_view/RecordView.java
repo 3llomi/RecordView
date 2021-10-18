@@ -11,6 +11,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.Chronometer;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -63,6 +64,7 @@ public class RecordView extends RelativeLayout implements RecordLockViewListener
     float recordLockXInWindow = 0f;
     private boolean fractionReached = false;
     private float currentYFraction = 0f;
+    private boolean isLockInSameParent = false;
 
 
     public RecordView(Context context) {
@@ -160,25 +162,27 @@ public class RecordView extends RelativeLayout implements RecordLockViewListener
         animationHelper = new AnimationHelper(context, basketImg, smallBlinkingMic, isRecordButtonGrowingAnimationEnabled);
 
         cancelTextView.setOnClickListener(v -> {
-
-            if (isTimeLimitValid()) {
-                removeTimeLimitCallbacks();
-            }
-
             animationHelper.animateBasket(basketInitialY);
-
-            isSwiped = true;
-
-            animationHelper.setStartRecorded(false);
-
-            if (recordListener != null) {
-                recordListener.onCancel();
-            }
-
-            resetRecord(recordButton);
-
+            cancelAndDeleteRecord();
         });
 
+    }
+
+    private void cancelAndDeleteRecord() {
+        if (isTimeLimitValid()) {
+            removeTimeLimitCallbacks();
+        }
+
+
+        isSwiped = true;
+
+        animationHelper.setStartRecorded(false);
+
+        if (recordListener != null) {
+            recordListener.onCancel();
+        }
+
+        resetRecord(recordButton);
     }
 
     private boolean isTimeLimitValid() {
@@ -308,13 +312,14 @@ public class RecordView extends RelativeLayout implements RecordLockViewListener
         recordBtn.getLocationInWindow(recordButtonLocation);
 
         initialRecordButtonY = recordButton.getY();
-        recordButtonYInWindow = recordButtonLocation[1] + recordButton.getHeight();
+        recordButtonYInWindow = recordButtonLocation[1];
 
         if (isLockEnabled && recordLockView != null) {
             int[] recordLockLocation = new int[2];
             recordLockView.getLocationInWindow(recordLockLocation);
             recordLockXInWindow = recordLockLocation[0];
-            recordLockYInWindow = recordLockLocation[1] + recordLockView.getHeight();
+            recordLockYInWindow = recordLockLocation[1];
+            isLockInSameParent = isLockAndRecordButtonHaveSameParent();
         }
 
 
@@ -528,6 +533,19 @@ public class RecordView extends RelativeLayout implements RecordLockViewListener
 
     }
 
+    private boolean isLockAndRecordButtonHaveSameParent() {
+        if (recordLockView == null){
+            return false;
+        }
+
+        ViewParent lockParent = recordLockView.getParent();
+        ViewParent recordButtonParent = recordButton.getParent();
+        if (lockParent == null || recordButtonParent == null) {
+            return false;
+        }
+        return lockParent == recordButtonParent;
+    }
+
     private void resetRecord(RecordButton recordBtn) {
         //if user has swiped then do not hide SmallMic since it will be hidden after swipe Animation
         hideViews(!isSwiped);
@@ -714,6 +732,21 @@ public class RecordView extends RelativeLayout implements RecordLockViewListener
         });
     }
 
+    /*
+    Use this if you want to Finish And save the Record if user closes the app for example in 'onPause()'
+     */
+    public void finishRecord() {
+        finishAndSaveRecord();
+    }
+
+    /*
+    Use this if you want to Cancel And delete the Record if user closes the app for example in 'onPause()'
+     */
+    public void cancelRecord() {
+        hideViews(true);
+        animationHelper.clearAlphaAnimation(false);
+        cancelAndDeleteRecord();
+    }
 
     @Override
     public void onFractionReached() {
