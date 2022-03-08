@@ -245,6 +245,15 @@ recordView.setRecordButtonGrowingAnimationEnabled(true);
 ## Looking for IOS Version?
 try out [iRecordView](https://github.com/3llomi/iRecordView)
 
+## Need a Chat app 💬 ?
+Checkout [FireApp Chat](https://1.envato.market/oebBM9)
+
+<a href="https://1.envato.market/oebBM9">
+<img src="http://devlomi.com/wp-content/uploads/2022/02/1.-Header-1.png" height="500" alt="FireApp" />
+</a>
+
+
+
 ```
    Copyright 2018 AbdulAlim Rajjoub
 
