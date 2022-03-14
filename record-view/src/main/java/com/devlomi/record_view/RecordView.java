@@ -408,9 +408,9 @@ public class RecordView extends RelativeLayout {
 
         if (recordPermissionHandler == null) {
             canRecord = true;
+        } else {
+            canRecord = recordPermissionHandler.isPermissionGranted();
         }
-
-        canRecord = recordPermissionHandler.isPermissionGranted();
 
         return canRecord;
     }
