@@ -36,7 +36,7 @@ dependencies {
   
 
     //for AndroidX use:
-    implementation 'com.github.3llomi:RecordView:3.0.2'
+    implementation 'com.github.3llomi:RecordView:3.1.1'
 
 
 }
