@@ -1,5 +1,7 @@
 package com.devlomi.recordview;
 
+import static androidx.core.content.PermissionChecker.PERMISSION_GRANTED;
+
 import android.Manifest;
 import android.graphics.Color;
 import android.os.Build;
@@ -25,8 +27,6 @@ import java.io.IOException;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-import static androidx.core.content.PermissionChecker.PERMISSION_GRANTED;
-
 public class MainActivity extends AppCompatActivity {
 
     private AudioRecorder audioRecorder;
@@ -39,10 +39,13 @@ public class MainActivity extends AppCompatActivity {
 
         audioRecorder = new AudioRecorder();
 
-        RecordView recordView = (RecordView) findViewById(R.id.record_view);
-        final RecordButton recordButton = (RecordButton) findViewById(R.id.record_button);
-        Button btnChangeOnclick = (Button) findViewById(R.id.btn_change_onclick);
+        RecordView recordView = findViewById(R.id.record_view);
+        final RecordButton recordButton = findViewById(R.id.record_button);
+        Button btnChangeOnclick = findViewById(R.id.btn_change_onclick);
 
+        // To Enable Record Lock
+//        recordView.setLockEnabled(true);
+//        recordView.setRecordLockImageView(findViewById(R.id.record_lock));
         //IMPORTANT
         recordButton.setRecordView(recordView);
 

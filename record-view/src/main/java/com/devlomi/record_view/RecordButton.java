@@ -21,10 +21,13 @@ public class RecordButton extends AppCompatImageView implements View.OnTouchList
     private RecordView recordView;
     private boolean listenForRecord = true;
     private OnRecordClickListener onRecordClickListener;
-
+    private OnRecordClickListener sendClickListener;
+    private boolean isInLockMode = false;
+    private Drawable micIcon, sendIcon;
 
     public void setRecordView(RecordView recordView) {
         this.recordView = recordView;
+        recordView.setRecordButton(this);
     }
 
     public RecordButton(Context context) {
@@ -49,10 +52,15 @@ public class RecordButton extends AppCompatImageView implements View.OnTouchList
             TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.RecordButton);
 
             int imageResource = typedArray.getResourceId(R.styleable.RecordButton_mic_icon, -1);
+            int sendResource = typedArray.getResourceId(R.styleable.RecordButton_send_icon, -1);
 
 
             if (imageResource != -1) {
                 setTheImageResource(imageResource);
+            }
+
+            if (sendResource != -1) {
+                sendIcon = AppCompatResources.getDrawable(getContext(), sendResource);
             }
 
             typedArray.recycle();
@@ -93,6 +101,7 @@ public class RecordButton extends AppCompatImageView implements View.OnTouchList
     private void setTheImageResource(int imageResource) {
         Drawable image = AppCompatResources.getDrawable(getContext(), imageResource);
         setImageDrawable(image);
+        micIcon = image;
     }
 
 
@@ -143,10 +152,39 @@ public class RecordButton extends AppCompatImageView implements View.OnTouchList
         this.onRecordClickListener = onRecordClickListener;
     }
 
+    protected void setSendClickListener(OnRecordClickListener sendClickListener) {
+        this.sendClickListener = sendClickListener;
+    }
+
+    protected void setInLockMode(boolean inLockMode) {
+        isInLockMode = inLockMode;
+    }
+
+    public void setSendIconResource(int resource) {
+        sendIcon = AppCompatResources.getDrawable(getContext(), resource);
+    }
 
     @Override
     public void onClick(View v) {
-        if (onRecordClickListener != null)
-            onRecordClickListener.onClick(v);
+        if (isInLockMode && sendClickListener != null) {
+            sendClickListener.onClick(v);
+        } else {
+            if (onRecordClickListener != null)
+                onRecordClickListener.onClick(v);
+        }
     }
+
+    protected void changeIconToSend() {
+        if (sendIcon != null) {
+            setImageDrawable(sendIcon);
+        }
+    }
+
+    protected void changeIconToRecord() {
+        if (micIcon != null) {
+            setImageDrawable(micIcon);
+        }
+    }
+
+
 }
