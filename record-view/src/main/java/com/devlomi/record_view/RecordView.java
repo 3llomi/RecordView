@@ -312,14 +312,14 @@ public class RecordView extends RelativeLayout implements RecordLockViewListener
         recordBtn.getLocationInWindow(recordButtonLocation);
 
         initialRecordButtonY = recordButton.getY();
-        recordButtonYInWindow = recordButtonLocation[1];
 
         if (isLockEnabled && recordLockView != null) {
+            isLockInSameParent = isLockAndRecordButtonHaveSameParent();
             int[] recordLockLocation = new int[2];
             recordLockView.getLocationInWindow(recordLockLocation);
             recordLockXInWindow = recordLockLocation[0];
-            recordLockYInWindow = recordLockLocation[1];
-            isLockInSameParent = isLockAndRecordButtonHaveSameParent();
+            recordLockYInWindow = isLockInSameParent ? recordLockView.getY() : recordLockLocation[1];
+            recordButtonYInWindow = isLockInSameParent ? recordButton.getY() : recordButtonLocation[1];
         }
 
 
@@ -414,7 +414,7 @@ public class RecordView extends RelativeLayout implements RecordLockViewListener
                    since motionEvent.getRawY() returns Y's location onScreen
                    we had to get screen height and get the difference between motionEvent and screen height
                  */
-                float newY = motionEvent.getRawY() - recordButtonYInWindow;
+                float newY = isLockInSameParent ? motionEvent.getRawY() : motionEvent.getRawY() - recordButtonYInWindow;
                 if (canMoveY(motionEvent, newY)) {
 
                     recordBtn.animate()
@@ -465,8 +465,11 @@ public class RecordView extends RelativeLayout implements RecordLockViewListener
              1. prevent swiping below record button
              2. prevent swiping up if record button is NOT near record Lock's X
              */
-            return dif <= initialRecordButtonY
-                    && motionEvent.getRawX() >= recordLockXInWindow;
+            if(isLockInSameParent){
+                return motionEvent.getRawY() < initialRecordButtonY && motionEvent.getRawX() >= recordLockXInWindow;
+            }else {
+                return dif <= initialRecordButtonY && motionEvent.getRawX() >= recordLockXInWindow;
+            }
         }
 
         return false;
@@ -581,10 +584,9 @@ public class RecordView extends RelativeLayout implements RecordLockViewListener
 
         if (recordPermissionHandler == null) {
             canRecord = true;
-            return true;
+        } else {
+            canRecord = recordPermissionHandler.isPermissionGranted();
         }
-
-        canRecord = recordPermissionHandler.isPermissionGranted();
 
         return canRecord;
     }
