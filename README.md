@@ -165,10 +165,23 @@ recordView.setOnBasketAnimationEndListener(new OnBasketAnimationEnd() {
 ```
 
 ### Enable Record Lock Feature
+```xml
+<com.devlomi.record_view.RecordLockView
+        android:id="@+id/record_lock"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_above="@id/record_view_relative_layout"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="4dp"
+        android:layout_marginBottom="100dp" />
+```
+
 ```java
 recordView.setLockEnabled(true);
 recordView.setRecordLockImageView(findViewById(R.id.record_lock));
 ```
+
+
 
 Change Swipe To Cancel Bounds (when the 'Slide To Cancel' Text View get before Counter).
 default is 8dp
