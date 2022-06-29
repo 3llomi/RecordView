@@ -17,10 +17,24 @@ A Simple Audio Recorder View with hold to Record Button and Swipe to Cancel
 
 
 ## Install
-Add this to your project build.gradle
+
+Add this to your project build.gradle (for older versions only)
+
 ```gradle
 allprojects {
     repositories {
+        ...
+        maven { url 'https://jitpack.io }
+    }
+}
+```
+
+Add this to your settings.gradle(for newer versions only)
+
+```gradle
+dependencyResolutionManagement {
+    repositories {
+        ...
         maven { url 'https://jitpack.io' }
     }
 }
