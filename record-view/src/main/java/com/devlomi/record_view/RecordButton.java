@@ -51,7 +51,7 @@ public class RecordButton extends AppCompatImageView implements View.OnTouchList
 
             int imageResource = typedArray.getResourceId(R.styleable.RecordButton_mic_icon, -1);
             int sendResource = typedArray.getResourceId(R.styleable.RecordButton_send_icon, -1);
-            int scaleUpTo = typedArray.getResourceId(R.styleable.RecordButton_scale_up_to, -1);
+            float scaleUpTo = typedArray.getFloat(R.styleable.RecordButton_scale_up_to, -1f);
 
             if (imageResource != -1) {
                 setTheImageResource(imageResource);
@@ -62,7 +62,7 @@ public class RecordButton extends AppCompatImageView implements View.OnTouchList
             }
 
             if (scaleUpTo != -1) {
-                scaleAnim.setScaleUpTo(scaleUpTo);
+                setScaleUpTo(scaleUpTo);
             }
             typedArray.recycle();
         }
