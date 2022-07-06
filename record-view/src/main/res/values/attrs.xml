@@ -17,6 +17,7 @@
 
         <attr name="mic_icon" format="reference" />
         <attr name="send_icon" format="reference" />
+        <attr name="scale_up_to" format="reference" />
 
     </declare-styleable>
 
