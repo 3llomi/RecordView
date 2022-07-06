@@ -11,17 +11,21 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 
 public class ScaleAnim {
     private View view;
+    private float scaleUpTo = 2.0f;
 
     public ScaleAnim(View view) {
         this.view = view;
     }
 
+    public void setScaleUpTo(float scaleUpTo) {
+        this.scaleUpTo = scaleUpTo;
+    }
 
     void start() {
         AnimatorSet set = new AnimatorSet();
 
-        ObjectAnimator scaleY = ObjectAnimator.ofFloat(view, "scaleY", 2.0f);
-        ObjectAnimator scaleX = ObjectAnimator.ofFloat(view, "scaleX", 2.0f);
+        ObjectAnimator scaleY = ObjectAnimator.ofFloat(view, "scaleY", scaleUpTo);
+        ObjectAnimator scaleX = ObjectAnimator.ofFloat(view, "scaleX", scaleUpTo);
 
         set.setDuration(150);
         set.setInterpolator(new AccelerateDecelerateInterpolator());
