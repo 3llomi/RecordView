@@ -61,6 +61,7 @@ public class RecordButton extends AppCompatImageView implements View.OnTouchList
             if (sendResource != -1) {
                 sendIcon = AppCompatResources.getDrawable(getContext(), sendResource);
             }
+
             typedArray.recycle();
         }
 

@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
 
         RecordView recordView = findViewById(R.id.record_view);
         final RecordButton recordButton = findViewById(R.id.record_button);
+        recordButton.setScaleUpTo(1.5f);
         Button btnChangeOnclick = findViewById(R.id.btn_change_onclick);
 
         // To Enable Record Lock
