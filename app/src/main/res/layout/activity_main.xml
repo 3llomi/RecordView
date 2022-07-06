@@ -55,6 +55,7 @@
             android:background="@drawable/recv_bg_mic"
             android:scaleType="centerInside"
             app:mic_icon="@drawable/recv_ic_mic_white"
+            app:scale_up_to="2.5"
             app:send_icon="@drawable/recv_ic_send" />
     </RelativeLayout>
 

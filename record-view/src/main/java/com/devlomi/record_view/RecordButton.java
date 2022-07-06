@@ -43,17 +43,16 @@ public class RecordButton extends AppCompatImageView implements View.OnTouchList
     public RecordButton(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init(context, attrs);
-
-
     }
 
     private void init(Context context, AttributeSet attrs) {
+        float scaleUpTo = 1f;
         if (attrs != null) {
             TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.RecordButton);
 
             int imageResource = typedArray.getResourceId(R.styleable.RecordButton_mic_icon, -1);
             int sendResource = typedArray.getResourceId(R.styleable.RecordButton_send_icon, -1);
-
+            scaleUpTo = typedArray.getFloat(R.styleable.RecordButton_scale_up_to, -1f);
 
             if (imageResource != -1) {
                 setTheImageResource(imageResource);
@@ -62,24 +61,26 @@ public class RecordButton extends AppCompatImageView implements View.OnTouchList
             if (sendResource != -1) {
                 sendIcon = AppCompatResources.getDrawable(getContext(), sendResource);
             }
-
             typedArray.recycle();
         }
 
-
         scaleAnim = new ScaleAnim(this);
-
+        if (scaleUpTo > 1) {
+            scaleAnim.setScaleUpTo(scaleUpTo);
+        }
 
         this.setOnTouchListener(this);
         this.setOnClickListener(this);
-
-
     }
 
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
         setClip(this);
+    }
+
+    public void setScaleUpTo(Float scaleTo) {
+        scaleAnim.setScaleUpTo(scaleTo);
     }
 
     public void setClip(View v) {
@@ -126,9 +127,8 @@ public class RecordButton extends AppCompatImageView implements View.OnTouchList
             }
 
         }
+
         return isListenForRecord();
-
-
     }
 
 
@@ -168,9 +168,8 @@ public class RecordButton extends AppCompatImageView implements View.OnTouchList
     public void onClick(View v) {
         if (isInLockMode && sendClickListener != null) {
             sendClickListener.onClick(v);
-        } else {
-            if (onRecordClickListener != null)
-                onRecordClickListener.onClick(v);
+        } else if (onRecordClickListener != null) {
+            onRecordClickListener.onClick(v);
         }
     }
 
@@ -185,6 +184,4 @@ public class RecordButton extends AppCompatImageView implements View.OnTouchList
             setImageDrawable(micIcon);
         }
     }
-
-
 }

@@ -238,36 +238,38 @@ recordView.setSmallMicColor(Color.parseColor("#c2185b"));
 
 recordView.setSlideToCancelText("TEXT");
 
-//disable Sounds
+// disable Sounds
 recordView.setSoundEnabled(false);
 
-//prevent recording under one Second (it's false by default)
+// prevent recording under one Second (it's false by default)
 recordView.setLessThanSecondAllowed(false);
 
-//set Custom sounds onRecord 
-//you can pass 0 if you don't want to play sound in certain state
+// set Custom sounds onRecord 
+// you can pass 0 if you don't want to play sound in certain state
 recordView.setCustomSounds(R.raw.record_start,R.raw.record_finished,0);
 
-//change slide To Cancel Text Color
+// change slide To Cancel Text Color
 recordView.setSlideToCancelTextColor(Color.parseColor("#ff0000"));
-//change slide To Cancel Arrow Color
+// change slide To Cancel Arrow Color
 recordView.setSlideToCancelArrowColor(Color.parseColor("#ff0000"));
-//change Counter Time (Chronometer) color
+// change Counter Time (Chronometer) color
 recordView.setCounterTimeColor(Color.parseColor("#ff0000"));
 
-//enable or disable ShimmerEffect
+// enable or disable ShimmerEffect
 recordView.setShimmerEffectEnabled(true);
 
-//auto cancelling recording after timeLimit (In millis)  
+// auto cancelling recording after timeLimit (In millis)  
 recordView.setTimeLimit(30000);//30 sec
 
-//set Trash Icon Color (when slide to cancel is triggered)
+// set Trash Icon Color (when slide to cancel is triggered)
 recordView.setTrashIconColor(Color.parseColor("#fff000"));
 
 // enable or disable the Growing animation for record Button.
 recordView.setRecordButtonGrowingAnimationEnabled(true);
+// change scale up value on Growing animation.
+recordButton.setScaleUpTo(1.5f);
 
-//Lock Customization
+// Lock Customization
 recordLockView.setDefaultCircleColor(Color.parseColor("#0A81AB"));
 recordLockView.setCircleLockedColor(Color.parseColor("#314E52"));
 recordLockView.setLockColor(Color.WHITE);
