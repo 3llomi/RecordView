@@ -70,20 +70,20 @@ public class RecordView extends RelativeLayout implements RecordLockViewListener
     public RecordView(Context context) {
         super(context);
         this.context = context;
-        init(context, null, -1, -1);
+        init(context, null, 0, 0);
     }
 
 
     public RecordView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         this.context = context;
-        init(context, attrs, -1, -1);
+        init(context, attrs, 0, 0);
     }
 
     public RecordView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         this.context = context;
-        init(context, attrs, defStyleAttr, -1);
+        init(context, attrs, defStyleAttr, 0);
     }
 
 
@@ -107,7 +107,7 @@ public class RecordView extends RelativeLayout implements RecordLockViewListener
         hideViews(true);
 
 
-        if (attrs != null && defStyleAttr == -1 && defStyleRes == -1) {
+        if (attrs != null && defStyleAttr == 0 && defStyleRes == 0) {
             TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.RecordView,
                     defStyleAttr, defStyleRes);
 
