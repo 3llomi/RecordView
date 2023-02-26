@@ -754,6 +754,9 @@ public class RecordView extends RelativeLayout implements RecordLockViewListener
     public void onFractionReached() {
         fractionReached = true;
         switchToLockedMode();
+        if (recordListener != null) {
+            recordListener.onLock();
+        }
     }
 }
 

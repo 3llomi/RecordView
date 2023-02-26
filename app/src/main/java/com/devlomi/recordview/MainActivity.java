@@ -134,6 +134,12 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, "OnLessThanSecond", Toast.LENGTH_SHORT).show();
                 Log.d("RecordView", "onLessThanSecond");
             }
+
+            @Override
+            public void onLock() {
+                Toast.makeText(MainActivity.this, "onLock", Toast.LENGTH_SHORT).show();
+                Log.d("RecordView", "onLock");
+            }
         });
 
 

@@ -9,4 +9,5 @@ public interface OnRecordListener {
     void onCancel();
     void onFinish(long recordTime,boolean limitReached);
     void onLessThanSecond();
+    void onLock();
 }

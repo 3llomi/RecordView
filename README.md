@@ -146,6 +146,13 @@ recordView.setOnRecordListener(new OnRecordListener() {
               //When the record time is less than One Second
                 Log.d("RecordView", "onLessThanSecond");
             }
+
+            @Override
+            public void onLock() {
+            //When Lock gets activated
+            Log.d("RecordView", "onLock");
+            }
+            
         });
 
 ```
