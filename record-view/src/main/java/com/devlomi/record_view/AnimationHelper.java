@@ -176,13 +176,16 @@ public class AnimationHelper {
         }
     }
 
-
-    public void clearAlphaAnimation(boolean hideView) {
-        alphaAnimation.cancel();
-        alphaAnimation.reset();
-        smallBlinkingMic.clearAnimation();
-        if (hideView) {
-            smallBlinkingMic.setVisibility(View.GONE);
+   public void clearAlphaAnimation(boolean hideView) {
+        if (alphaAnimation != null) {
+            alphaAnimation.cancel();
+            alphaAnimation.reset();
+        }
+        if (smallBlinkingMic != null) {
+            smallBlinkingMic.clearAnimation();
+            if (hideView) {
+                smallBlinkingMic.setVisibility(View.GONE);
+            }
         }
     }
 
