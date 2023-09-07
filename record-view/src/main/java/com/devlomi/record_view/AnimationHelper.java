@@ -178,8 +178,10 @@ public class AnimationHelper {
 
 
     public void clearAlphaAnimation(boolean hideView) {
-        alphaAnimation.cancel();
-        alphaAnimation.reset();
+        if (alphaAnimation!=null) {
+            alphaAnimation.cancel();
+            alphaAnimation.reset();
+        }
         smallBlinkingMic.clearAnimation();
         if (hideView) {
             smallBlinkingMic.setVisibility(View.GONE);
